@@ -1,5 +1,5 @@
 {
-    "name": "isdev-eth",
+    "name": "dev3-eth",
     "version": "0.0.1-alpha",
     "description": "ENS-on-GitHub by NameSys",
     "main": "index.js",
@@ -11,10 +11,10 @@
     "license": "MIT",
     "type": "module",
     "dependencies": {
-        "@noble/hashes": "^1.3.2",
         "@noble/secp256k1": "^2.0.0",
         "axios": "^1.6.2",
         "ethers": "^6.9.0",
+        "fs": "^0.0.1-security",
         "readline": "^1.3.0"
     }
 }
