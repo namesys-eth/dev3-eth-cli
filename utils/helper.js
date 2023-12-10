@@ -73,6 +73,16 @@ async function gitCommitPush(branch, timestamp) {
   }
 }
 
+// Checks if GitHub Pages is configured
+async function isGHPConfigured(username) {
+  try {
+    const response = await axios.get(`https://${username}.github.io/`)
+    return response.status === 200 && response.status !== 404
+  } catch (error) {
+    return false
+  }
+}
+
 // Writes to .env & verify.json, and .gitignore
 async function writeConfig(signerKey) {
   const envContent = `SIGNER=${signerKey[0]}`
@@ -109,5 +119,6 @@ export default {
   isGitRepo,
   getGitRepo,
   writeConfig,
-  gitCommitPush
+  gitCommitPush,
+  isGHPConfigured
 }
