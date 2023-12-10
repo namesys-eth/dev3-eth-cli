@@ -4,7 +4,8 @@
     "description": "ENS-on-GitHub by NameSys",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js"
+        "init": "node init.js",
+        "publish": "node publish.js"
     },
     "keywords": [],
     "author": "NameSys",

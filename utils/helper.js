@@ -62,10 +62,21 @@ async function getGitRepo() {
   }
 }
 
-// Attempts Git Commit & Push
-async function gitCommitPush(branch, timestamp) {
+// Attempts Git Commit & Push of Config
+async function gitCommitPushConfig(branch, timestamp) {
   try {
-    execSync(`git add verify.json .gitignore; git commit -m "dev3.eth: ${timestamp}"; git push origin ${branch}`)
+    execSync(`git add verify.json .gitignore .nojekyll; git commit -m "dev3 init: ${timestamp}"; git push origin ${branch}`)
+    return true
+  } catch (error) {
+    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "red")
+    return null
+  }
+}
+
+// Attempts Git Commit & Push of Signed Records
+async function gitCommitPushRecords(branch, timestamp) {
+  try {
+    execSync(`git add verify.json .well-known; git commit -m "dev3 publish: ${timestamp}"; git push origin ${branch}`)
     return true
   } catch (error) {
     graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "red")
@@ -119,6 +130,7 @@ export default {
   isGitRepo,
   getGitRepo,
   writeConfig,
-  gitCommitPush,
-  isGHPConfigured
+  gitCommitPushConfig,
+  isGHPConfigured,
+  gitCommitPushRecords,
 }

@@ -42,12 +42,12 @@ function validateGitRepo() {
                 _githubKey
             ])
         } else {
-            graphics.print(`❌ Not a Git Repository. Please initialise and configure as Git repository. Quitting...`, "red")
+            graphics.print(`❌ Not a Git Repository! Please initialise and configure as Git repository, then run \'npm run init\'. Quitting...`, "red")
             graphics.print(`❗ PRE-REQUISITES:`, "orange")
             graphics.print(`👉 Please make sure that Git repository is initialised and configured to push to remote branch on GitHub`, "orange")
-            graphics.print(` ◥ https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "cyan")
+            graphics.print(` ◥ https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "skyblue")
             graphics.print(`👉 Please make sure that GitHub Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "cyan")
+            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve([
                 _isGitRepo,
                 null,
@@ -85,13 +85,13 @@ function validateGithubID() {
                     const _ghpages = await helper.isGHPConfigured(githubID)
                     if (_ghpages) {
                         graphics.print(`✅ GitHub Page exists: https://${githubID}.github.io/`, "lightgreen")
-                        graphics.print(`👉 Please make sure that GitHub Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-                        graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "cyan")
+                        graphics.print(`👉 Please make sure that GitHub Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+                        graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
                         resolve(true) // Resolve the promise with true
                     } else {
                         graphics.print(`❌ GitHub Page DOES NOT exist: https://${githubID}.github.io/`, "red")
                         graphics.print(`👉 Please make sure that GitHub Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-                        graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "cyan")
+                        graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
                         graphics.print(`❌ Quitting...`, "red")
                         resolve(false) // Resolve the promise with false
                     }
@@ -115,13 +115,13 @@ function skipGithubID(detectedUser) {
         const _ghpages = await helper.isGHPConfigured(detectedUser)
         if (_ghpages) {
             graphics.print(`✅ GitHub Page exists: https://${detectedUser}.github.io/`, "lightgreen")
-            graphics.print(`👉 Please make sure that GitHub Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "cyan")
+            graphics.print(`👉 Please make sure that GitHub Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve(true)
         } else {
             graphics.print(`❌ GitHub Page DOES NOT exist: https://${detectedUser}.github.io/`, "red")
             graphics.print(`👉 Please make sure that GitHub Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "cyan")
+            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             graphics.print(`❌ Quitting...`, "red")
             resolve(false)
         }
@@ -135,70 +135,64 @@ if (isGitRepo && detectedUser) {
 }
 const welcome = userDetected ? await skipGithubID(detectedUser) : await validateGithubID(detectedUser)
 
-// Gets Signer Keypair
-async function getSigner() {
+// Gets status of CF approval
+async function getStatus() {
     if (welcome) {
         return new Promise((resolve) => {
-            rl.question('⏰ Enter Signing Key (optional; leaving this field empty will generate a new signing key): ', async (_signerKey) => {
-                const signerKey = _signerKey.startsWith('0x') ? _signerKey.slice(2) : _signerKey
-                if (helper.isValidSigner(signerKey)) {
-                    graphics.print(`✅ Valid Signer Key`, "lightgreen")
-                    const _keypair = keygen.PUBKEY(signerKey)
-                    resolve(_keypair) // Resolve the promise
-                } else if (!signerKey) {
-                    graphics.print(`🧪 Generating New Signer Key...`, "skyblue")
-                    const _keypair = await keygen.KEYGEN()
-                    graphics.print(`✅ Successfully Generated New Signer Key!`, "lightgreen")
-                    resolve(_keypair) // Resolve the promise
-                } else {
-                    graphics.print('❌ Invalid Signer Key! Please try again OR press CTRL + C to exit', "red")
-                    resolve(await getSigner())
-                }
-            })
+            resolve()
         })
     }
 }
-const keypair = await getSigner()
+const status = await getStatus()
 
-// Set Signer key
-async function setKeypair(keypair) {
-    if (keypair) {
+// Gets CF approval
+async function verifyWithCF() {
+    if (status) {
         return new Promise(async (resolve) => {
-            const _config = await helper.writeConfig(keypair)
-            graphics.print(`✅ Signer written to .env & verify.json, and validated .gitignore`, "lightgreen")
-            resolve(_config)
+            resolve()
         })
     }
 }
-const configured = await setKeypair(keypair)
+const verified = await verifyWithCF()
+
+// Signs ENS Records
+async function signRecords() {
+    if (status) {
+        return new Promise(async (resolve) => {
+            resolve()
+        })
+    }
+}
+const signed = await signRecords()
 
 // Attempt Git Commit & Push
-async function gitCommitPush(configured, branch, githubKey) {
-    if (configured) {
+async function gitCommitPush(signed, branch, githubKey, detectedUser) {
+    if (signed) {
         return new Promise(async (resolve) => {
             const timestamp = Date.now()
             graphics.print(`🧪 Detected Branch: ${branch}`, "skyblue")
             if (githubKey) {
                 graphics.print(`🧪 Detected Signature Fingerprint: ${githubKey}`, "skyblue")
-                graphics.print(`🧪 Attempting auto-update: git add verify.json .gitignore; git commit -S -m "dev3.eth: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+                graphics.print(`🧪 Attempting auto-update: git add verify.json .well-known; git commit -S -m "dev3.eth: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
             } else {
-                graphics.print(`🧪 Attempting auto-update: git add verify.json .gitignore; git commit -m "dev3.eth: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+                graphics.print(`🧪 Attempting auto-update: git add verify.json .well-known; git commit -m "dev3.eth: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
             }
             rl.question(`⏰ Attempt Git Commit & Push? [Y/N]: `, async (attempt) => {
                 if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
-                    const _pushed = await helper.gitCommitPush(branch, timestamp)
+                    const _pushed = await helper.gitCommitPushRecords(branch, timestamp)
                     resolve(_pushed)
-                    console.log()
+                    graphics.print(`🎉 Successfully Configured ENS-on-GitHub with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run publish\'`, "lightgreen")
+                    graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
                     resolve(false)
                 } else {
                     graphics.print('⛔ Bad Input', "orange")
-                    resolve(await gitCommitPush(configured, branch)) // Recursive call
+                    resolve(await gitCommitPushRecords(signed, branch, githubKey, detectedUser)) // Recursive call
                 }
             })
         })
     }
 }
-const pushed = await gitCommitPush(configured, branch, githubKey)
+const pushed = await gitCommitPush(signed, branch, githubKey, detectedUser)
 
