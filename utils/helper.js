@@ -3,7 +3,12 @@ import axios from 'axios'
 import constants from './constants.js'
 import graphics from './graphics.js'
 import { execSync } from 'child_process'
-import { ethers } from 'ethers'
+import { ethers, SigningKey, Wallet } from 'ethers'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+require('dotenv').config()
+
+const SIGNER = process.env.SIGNER
 
 // Checks if GitHub user exists with given GitHub ID
 async function githubIDExists(username) {
@@ -146,9 +151,13 @@ async function writeConfig(signerKey) {
   }
 }
 
-// Signs ENS Records
-async function signRecords() {
-  let _toSign = `Requesting Signature To Update ENS Record\n\nOrigin: ${ENS}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: ${_signer}`
+// Signs an ENS Record
+async function signRecord(gateway, chainID, resolver, recordType, extradata, signer) {
+  let _toSign = `Requesting Signature To Update ENS Record\n\nGateway: ${gateway}\nResolver: eip155:${chainID}:${resolver}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: ${signer}`
+  let _key = new SigningKey(SIGNER.slice(0, 2) === "0x" ? SIGNER : "0x" + SIGNER)
+  let _signer = new Wallet(_key)
+  let signature = await _signer.signMessage(_toSign)
+  return [_toSign, signature]
 }
 
 export default {
@@ -162,5 +171,5 @@ export default {
   isGHPConfigured,
   gitCommitPushRecords,
   isRemoteAhead,
-  signRecords
+  signRecord
 }

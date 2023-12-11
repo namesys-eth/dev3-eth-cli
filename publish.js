@@ -5,6 +5,9 @@ import constants from './utils/constants.js'
 import graphics from './utils/graphics.js'
 import helper from './utils/helper.js'
 import fs, { writeFileSync, readFileSync, existsSync } from 'fs'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+require('dotenv').config()
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -158,15 +161,15 @@ const welcome = synced ? (userDetected ? await skipGithubID(detectedUser) : awai
 
 // Define Records
 let addr60 = [
-    constants.record,
+    { ...constants.record },
     `.well-known/eth/dev3/${detectedUser}/addr/60.json`
 ]
 let avatar = [
-    constants.record,
+    { ...constants.record },
     `.well-known/eth/dev3/${detectedUser}/text/avatar.json`
 ]
 let contenthash = [
-    constants.record,
+    { ...constants.record },
     `.well-known/eth/dev3/${detectedUser}/contenthash.json`
 ]
 /* Define more ENS Records here */
@@ -180,7 +183,7 @@ async function writeRecords() {
                 if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
                     resolve(true)
                 } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
-                    rl.question(`⌛ Please manually edit \'value:\' key the JSON files, save them and then press ENTER: `, async (done) => {
+                    rl.question(`⌛ Please manually edit \'value:\' keys in JSON files, save them and then press ENTER: `, async (done) => {
                         resolve(false)
                     })
                 } else {
@@ -194,57 +197,61 @@ async function writeRecords() {
 let written = await writeRecords()
 
 // Writes ENS Records: addr60
-async function write_addr60() {
+async function write_addr60(_addr60_) {
     if (written) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
                 if (_addr60) {
                     if (constants.addressRegex.test(_addr60.slice(2))) {  // strip '0x'
-                        addr60[0].value = _addr60
-                        resolve(true)
+                        _addr60_[0].value = _addr60
+                        resolve([true, _addr60_])
                     } else {
                         graphics.print('⛔ Bad Input', "orange")
                         resolve(await write_addr60()) // Recursive call
                     }
                 } else {
-                    addr60[0].value = null
-                    resolve(true)
+                    _addr60_[0].value = null
+                    resolve([true, _addr60_])
                 }
             })
         })
     } else {
         return new Promise(async (resolve) => {
-            resolve(false)
+            resolve([false, _addr60_])
         })
     }
 }
-let written_addr60 = await write_addr60()
-
+let [written_addr60, _addr60] = await write_addr60(addr60)
+addr60 = _addr60
 // Writes ENS Records: avatar
-async function write_avatar() {
+async function write_avatar(_avatar_) {
     if (written && written_addr60) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
                 if (_avatar) {
                     if (constants.urlRegex.test(_avatar)) {
-                        avatar[0].value = _avatar
-                        resolve(true)
+                        _avatar_[0].value = _avatar
+                        resolve([true, _avatar_])
                     } else {
                         graphics.print('⛔ Bad Input', "orange")
                         resolve(await write_avatar()) // Recursive call
                     }
                 } else {
-                    avatar[0].value = null
-                    resolve(true)
+                    _avatar_[0].value = null
+                    resolve([true, _avatar_])
                 }
             })
         })
+    } else {
+        return new Promise(async (resolve) => {
+            resolve([false, _avatar_])
+        })
     }
 }
-let written_avatar = await write_avatar()
-
+let [written_avatar, _avatar] = await write_avatar(avatar)
+avatar = _avatar
 // Writes ENS Records: contenthash
-async function write_contenthash() {
+async function write_contenthash(_contenthash_) {
     if (written && written_addr60 && written_avatar) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter your contenthash value and then press ENTER: ', async (_contenthash) => {
@@ -255,25 +262,26 @@ async function write_contenthash() {
                         constants.ipfsRegexCID0.test(_contenthash.slice(7)) || // strip 'ipfs://'
                         constants.onionRegex.test(_contenthash.slice(8)) // strip 'onion://'
                     ) {
-                        contenthash[0].value = _contenthash
-                        resolve(true)
+                        _contenthash_[0].value = _contenthash
+                        resolve([true, _contenthash_])
                     } else {
                         graphics.print('⛔ Bad Input! Resetting...', "orange")
                         resolve(await writeRecords()) // Recursive call
                     }
                 } else {
-                    contenthash[0].value = null
-                    resolve(true)
+                    _contenthash_[0].value = null
+                    resolve([true, _contenthash_])
                 }
             })
         })
     } else {
         return new Promise(async (resolve) => {
-            resolve(false)
+            resolve([false, _contenthash_])
         })
     }
 }
-let written_contenthash = await write_contenthash()
+let [written_contenthash, _contenthash] = await write_contenthash(contenthash)
+contenthash = _contenthash
 
 // Confirms ENS Records
 async function confirmRecords() {
@@ -282,6 +290,9 @@ async function confirmRecords() {
             rl.question('⏰ Confirm Records Update? [Y/N]: ', async (_write) => {
                 if (_write.toLowerCase() === 'y' || _write.toLowerCase() === 'yes') {
                     graphics.print(`🧪 Processing...`, "skyblue")
+                    if (addr60[0].value) writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
+                    if (avatar[0].value) writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
+                    if (contenthash[0].value) writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
                     resolve(true)
                 } else if (_write.toLowerCase() === 'n' || _write.toLowerCase() === 'no') {
                     graphics.print(`❌ Quitting...`, "orange")
@@ -302,87 +313,99 @@ let confirmed = await confirmRecords()
 
 // Verifies ENS Records
 async function verifyRecords() {
-    if (!confirmed && !written && !written_addr60 && !written_avatar && !written_contenthash) {
-        return new Promise(async (resolve) => {
-            const __addr60 = existsSync(constants.records.addr60) ? JSON.parse(readFileSync(constants.records.addr60, 'utf-8')) : constants.record
-            const __avatar = existsSync(constants.records.avatar) ? JSON.parse(readFileSync(constants.records.avatar, 'utf-8')) : constants.record
-            const __contenthash = existsSync(constants.records.contenthash) ? JSON.parse(readFileSync(constants.records.contenthash, 'utf-8')) : constants.record
-            // validity flags
-            var flag = {
-                addr60: false,
-                avatar: false,
-                contenthash: false
-            }
-            // addr60
-            if (__addr60 && __addr60.value !== null && constants.addressRegex.test(__addr60.value.slice(2))) { // strip '0x'
-                flag.addr60 = true
-            } else {
-                graphics.print('❗ Bad Value in addr/60. Please check \'value:\' key in \'records/addr/60.json\'', "orange")
-            }
-            // avatar
-            if (__avatar && __avatar.value !== null && constants.urlRegex.test(__avatar.value)) {
-                flag.avatar = true
-            } else {
-                graphics.print('❗ Bad Value in text/avatar. Please check \'value:\' key in \'records/text/avatar.json\'', "orange")
-            }
-            // contenthash
-            if (__contenthash &&
-                __contenthash.value !== null &&
-                (
-                    constants.ipnsRegex.test(__contenthash.slice(7)) || // strip 'ipns://'
-                    constants.ipfsRegexCID0.test(__contenthash.slice(7)) || // strip 'ipfs://'
-                    constants.ipfsRegexCID0.test(__contenthash.slice(7)) || // strip 'ipfs://'
-                    constants.onionRegex.test(__contenthash.slice(8)) // strip 'onion://'
-                )
-            ) {
-                flag.contenthash = true
-            } else {
-                graphics.print('❗ Bad Contenthash Value. Please check \'value:\' key in \'records/contenthash.json\'', "orange")
-            }
-            /* add more ENS Records here */
-            if (Object.values(flag).every(value => value === true)) {
-                resolve(true)
-            } else {
-                resolve(false)
-            }
-        })
+    //if (!confirmed && !written && !written_addr60 && !written_avatar && !written_contenthash) {
+    return new Promise(async (resolve) => {
+        const __addr60 = existsSync(constants.records.addr60) ? JSON.parse(readFileSync(constants.records.addr60, 'utf-8')) : constants.record
+        const __avatar = existsSync(constants.records.avatar) ? JSON.parse(readFileSync(constants.records.avatar, 'utf-8')) : constants.record
+        const __contenthash = existsSync(constants.records.contenthash) ? JSON.parse(readFileSync(constants.records.contenthash, 'utf-8')) : constants.record
+        // validity flags
+        var flag = {
+            addr60: false,
+            avatar: false,
+            contenthash: false
+        }
+        // addr60
+        if (__addr60 && __addr60.value !== null && constants.addressRegex.test(__addr60.value.slice(2))) { // strip '0x'
+            flag.addr60 = true
+        } else {
+            graphics.print('❗ Bad Value in addr/60. Please check \'value:\' key in \'records/addr/60.json\'', "orange")
+        }
+        // avatar
+        if (__avatar && __avatar.value !== null && constants.urlRegex.test(__avatar.value)) {
+            flag.avatar = true
+        } else {
+            graphics.print('❗ Bad Value in text/avatar. Please check \'value:\' key in \'records/text/avatar.json\'', "orange")
+        }
+        // contenthash
+        if (__contenthash &&
+            __contenthash.value !== null &&
+            (
+                constants.ipnsRegex.test(__contenthash.value.slice(7)) || // strip 'ipns://'
+                constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
+                constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
+                constants.onionRegex.test(__contenthash.value.slice(8)) // strip 'onion://'
+            )
+        ) {
+            flag.contenthash = true
+        } else {
+            graphics.print('❗ Bad Contenthash Value. Please check \'value:\' key in \'records/contenthash.json\'', "orange")
+        }
+        /* add more ENS Records here */
+        if (Object.values(flag).every(value => value === true)) {
+            graphics.print(`✅ Record Files Verified!`, "lightgreen")
+            resolve(true)
+        } else {
+            graphics.print(`❗ Record Files Failed Verification!`, "orange")
+            resolve(false)
+        }
+    })
+    /*   
     } else {
         return new Promise(async (resolve) => {
             resolve(true) // Skip verification
         })
     }
+    */
 }
 const verified = await verifyRecords()
 
 // Signs ENS Records
-async function signRecords() {
+async function signRecords(record, type) {
     if (verified) {
         return new Promise(async (resolve) => {
-            graphics.print(`✅ Record Files Verified!`, "lightgreen")
-            graphics.print(`🧪 Signing Your Records...`, "skyblue")
-            const _signed = helper.signRecords()
+            graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
+            const _signed = helper.signRecord(
+                'https://gateway.com',
+                '1',
+                '0x4675C7e5BaAFBFFbca748158bEcBA61ef0000000',
+                type,
+                record.value,
+                JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+            )
             resolve(_signed)
-            rl.close()
         })
     } else {
         return new Promise(async (resolve) => {
             graphics.print('❌ Please fix the Records files & then re-try \'npm run publish\'. Quitting...', "orange")
-            resolve(false)
+            resolve([null, null])
             rl.close()
         })
     }
 }
-const signed = await signRecords()
+const [payload_addr60, signature_addr60] = await signRecords(addr60, 'addr/60')
+const [payload_avatar, signature_avatar] = await signRecords(avatar, 'text/avatar')
+const [payload_contenthash, signature_contenthash] = await signRecords(contenthash, 'contenthash')
 
 // Gets status of CF approval
 async function getStatus() {
-    if (signed) {
+    if (signature_addr60 && signature_avatar && signature_contenthash) {
         return new Promise((resolve) => {
-            resolve(true)
+            rl.close()
+            resolve()
         })
     } else {
         return new Promise(async (resolve) => {
-            resolve(false)
+            resolve()
         })
     }
 }
@@ -392,11 +415,11 @@ const status = await getStatus()
 async function validateWithCF() {
     if (status) {
         return new Promise(async (resolve) => {
-            resolve(true)
+            resolve()
         })
     } else {
         return new Promise(async (resolve) => {
-            resolve(false)
+            resolve()
         })
     }
 }
@@ -435,5 +458,5 @@ async function gitCommitPush(signed, branch, githubKey, detectedUser) {
         })
     }
 }
-const pushed = await gitCommitPush(signed, branch, githubKey, detectedUser)
+const pushed = await gitCommitPush(validated, branch, githubKey, detectedUser)
 

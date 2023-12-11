@@ -5,6 +5,9 @@ import keygen from './utils/keygen.js'
 import constants from './utils/constants.js'
 import graphics from './utils/graphics.js'
 import helper from './utils/helper.js'
+import { createRequire } from 'module'
+const require = createRequire(import.meta.url)
+require('dotenv').config()
 
 const rl = readline.createInterface({
     input: process.stdin,

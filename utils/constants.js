@@ -30,9 +30,9 @@ const records = {
 }
 
 const record = {
-  data: undefined,
+  data: null,
   value: null,
-  manager: undefined,
+  manager: null,
   signature: null,
   approved: false,
   approver: null 
