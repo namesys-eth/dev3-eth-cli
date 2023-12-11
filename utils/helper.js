@@ -63,24 +63,48 @@ async function getGitRepo() {
 }
 
 // Attempts Git Commit & Push of Config
-async function gitCommitPushConfig(branch, timestamp) {
+async function gitCommitPushConfig(branch, timestamp, githubKey) {
   try {
-    execSync(`git add verify.json .gitignore .nojekyll; git commit -m "dev3 init: ${timestamp}"; git push origin ${branch}`)
+    if (githubKey) {
+      execSync(`git add verify.json .gitignore .nojekyll; git commit -S -m "dev3 init: ${timestamp}"; git push -u origin ${branch}`)
+    } else {
+      execSync(`git add verify.json .gitignore .nojekyll; git commit -m "dev3 init: ${timestamp}"; git push -u origin ${branch}`)
+    }
     return true
   } catch (error) {
-    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "red")
+    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "orange")
     return null
   }
 }
 
 // Attempts Git Commit & Push of Signed Records
-async function gitCommitPushRecords(branch, timestamp) {
+async function gitCommitPushRecords(branch, timestamp, githubKey) {
   try {
-    execSync(`git add verify.json .well-known; git commit -m "dev3 publish: ${timestamp}"; git push origin ${branch}`)
+    if (githubKey) {
+      execSync(`git add verify.json .well-known; git commit -S -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`)
+    } else {
+      execSync(`git add verify.json .well-known; git commit -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`)
+    }
     return true
   } catch (error) {
-    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "red")
+    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "orange")
     return null
+  }
+}
+
+//Checks if remote tip is ahead of local
+async function isRemoteAhead(branch) {
+  try {
+    // Get the commit hash of the local branch
+    const localCommit = execSync(`git rev-parse ${branch}`).toString().trim()
+    // Get the commit hash of the remote branch
+    const remoteCommit = execSync(`git ls-remote origin ${branch}`).toString().split('\t')[0].trim()
+    // Check if the remote commit is ahead of the local commit
+    return localCommit !== remoteCommit
+  } catch (error) {
+    // Handle errors, e.g., when git commands fail
+    graphics.print('❗ Failed to Fetch Remote Branch...', "orange")
+    return false
   }
 }
 
@@ -98,8 +122,7 @@ async function isGHPConfigured(username) {
 async function writeConfig(signerKey) {
   const envContent = `SIGNER=${signerKey[0]}`
   const verifyContent = {
-    signer: ethers.computeAddress(`0x${signerKey[0]}`).slice(2),
-    pubkey: signerKey[1],
+    signer: ethers.computeAddress(`0x${signerKey[0]}`),
     verified: false,
     accessKey: null
   }
@@ -123,6 +146,11 @@ async function writeConfig(signerKey) {
   }
 }
 
+// Signs ENS Records
+async function signRecords() {
+  let _toSign = `Requesting Signature To Update ENS Record\n\nOrigin: ${ENS}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: ${_signer}`
+}
+
 export default {
   githubIDExists,
   isValidGithubID,
@@ -133,4 +161,6 @@ export default {
   gitCommitPushConfig,
   isGHPConfigured,
   gitCommitPushRecords,
+  isRemoteAhead,
+  signRecords
 }
