@@ -22,7 +22,7 @@ graphics.print(graphics.initAsciiArt, 'orange')
 console.log()
 
 // Check Git Repository
-const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo()
+const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
 let userDetected = undefined
 if (isGitRepo && detectedUser && synced) {
     userDetected = await helper.requestGithubID(detectedUser, rl)

@@ -85,7 +85,7 @@ async function getGitRepo() {
 }
 
 // Checks if the user is in a Git repo
-function validateGitRepo() {
+function validateGitRepo(rl) {
   return new Promise(async (resolve) => {
     const _isGitRepo = isGitRepo()
     if (_isGitRepo) {
