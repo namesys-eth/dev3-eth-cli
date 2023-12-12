@@ -202,7 +202,7 @@ function skipGithubID(detectedUser) {
   })
 }
 
-// Attempts Git Commit & Push of Config
+// Sends Git Commit & Push to Remote
 async function gitSend(branch, timestamp, githubKey, files) {
   try {
     if (githubKey) {
