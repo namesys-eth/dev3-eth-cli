@@ -199,7 +199,26 @@ const colors = {
 // Function to print colored text
 const print = (text, color) => {
   console.log(`${colors[color]}${text}${colors.reset}`)
-};
+}
+
+// Prints dev3.eth logo
+function logo() {
+  for (let i = 0; i < letter3.length; i++) {
+    print(
+        combineLetters(
+            ' ',
+            letterD[i],
+            letterE[i],
+            letterV[i],
+            letter3[i],
+            letter_[i],
+            lettere[i],
+            lettert[i],
+            letterh[i]
+        ), "green"
+    )
+  }
+}
 
 export default {
   letterI,
@@ -224,7 +243,8 @@ export default {
   asciiArt,
   combineLetters,
   colors,
-  print
+  print,
+  logo
 }
 
 
