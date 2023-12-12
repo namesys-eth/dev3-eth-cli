@@ -1,6 +1,6 @@
 {
   "signer": "0xC535D0848F33a9Cb9B73cAAd43c5F73F6632e8dD",
-  "approvedSig": null,
+  "approval": null,
   "records": {
     "contenthash": null,
     "address": {
@@ -10,5 +10,5 @@
       "avatar": null
     }
   },
-  "githubid": "namesys-eth"
+  "githubid": null
 }

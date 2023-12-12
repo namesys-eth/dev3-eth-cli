@@ -55,6 +55,7 @@ function validateGitRepo() {
             } else {
                 graphics.print(`❗ Cannot publish! Remote branch is ahead of local. please \'git merge\' or \'git pull\' to sync with remote tip and then try again`, "orange")
                 graphics.print(`❌ Please \'git merge\' or \'git pull\' to sync with remote tip and then try again. Quitting...`, "orange")
+                rl.close()
                 resolve([
                     _isGitRepo,
                     null,
@@ -62,7 +63,6 @@ function validateGitRepo() {
                     null,
                     null
                 ])
-                rl.close()
             }
         } else {
             graphics.print(`❌ Not a git repository! Please initialise and configure as git repository first, and then run \'npm run init\'. Quitting...`, "orange")
@@ -71,6 +71,7 @@ function validateGitRepo() {
             graphics.print(` ◥ https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "skyblue")
             graphics.print(`👉 Please make sure that Github Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
             graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+            rl.close()
             resolve([
                 _isGitRepo,
                 null,
@@ -156,6 +157,9 @@ const [isGitRepo, detectedUser, branch, githubKey, synced] = await validateGitRe
 let userDetected = undefined
 if (isGitRepo && detectedUser && synced) {
     userDetected = await requestGithubID(detectedUser)
+} else {
+    graphics.print(`❌ Quitting...`, "orange")
+    rl.close()
 }
 const welcome = synced ? (userDetected ? await skipGithubID(detectedUser) : await validateGithubID(detectedUser)) : false
 
@@ -198,7 +202,7 @@ let written = await writeRecords()
 
 // Writes ENS Records: addr60
 async function write_addr60(_addr60_) {
-    if (written) {
+    if (welcome && written) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
                 if (_addr60) {
@@ -225,7 +229,7 @@ let [written_addr60, _addr60] = await write_addr60(addr60)
 addr60 = _addr60
 // Writes ENS Records: avatar
 async function write_avatar(_avatar_) {
-    if (written && written_addr60) {
+    if (welcome && written && written_addr60) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
                 if (_avatar) {
@@ -252,7 +256,7 @@ let [written_avatar, _avatar] = await write_avatar(avatar)
 avatar = _avatar
 // Writes ENS Records: contenthash
 async function write_contenthash(_contenthash_) {
-    if (written && written_addr60 && written_avatar) {
+    if (welcome && written && written_addr60 && written_avatar) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter your contenthash value and then press ENTER: ', async (_contenthash) => {
                 if (_contenthash) {
@@ -285,7 +289,7 @@ contenthash = _contenthash
 
 // Confirms ENS Records
 async function confirmRecords(detectedUser) {
-    if (written && written_addr60 && written_avatar && written_contenthash) {
+    if (welcome && written && written_addr60 && written_avatar && written_contenthash) {
         return new Promise(async (resolve) => {
             rl.question('⏰ Confirm Records Update? [Y/N]: ', async (_write) => {
                 if (_write.toLowerCase() === 'y' || _write.toLowerCase() === 'yes') {
@@ -312,7 +316,7 @@ async function confirmRecords(detectedUser) {
                     // githubid
                     _buffer.githubid = detectedUser
                     // signer
-                    _buffer.signer = JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+                    _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
                     writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
                     resolve(true)
                 } else if (_write.toLowerCase() === 'n' || _write.toLowerCase() === 'no') {
@@ -325,51 +329,53 @@ async function confirmRecords(detectedUser) {
             })
         })
     } else {
-        return new Promise(async (resolve) => {
-            let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
-            _buffer.githubid = detectedUser
-            _buffer.signer = JSON.parse(readFileSync('verify.json', 'utf-8')).signer
-            // Read from buffer
-            addr60[0].value = _buffer.records.address.eth
-            avatar[0].value = _buffer.records.text.avatar
-            contenthash[0].value = _buffer.records.contenthash
-            writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
-            // addr60
-            if (_buffer.records.address.eth) {
-                const _file = await helper.createDeepFile(constants.records.addr60)
-                if (_file) {
-                    writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
-                } else {
-                    resolve(false)
+        if (welcome) {
+            return new Promise(async (resolve) => {
+                let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                _buffer.githubid = detectedUser
+                _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
+                // Read from buffer
+                addr60[0].value = _buffer.records.address.eth
+                avatar[0].value = _buffer.records.text.avatar
+                contenthash[0].value = _buffer.records.contenthash
+                writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
+                // addr60
+                if (_buffer.records.address.eth) {
+                    const _file = await helper.createDeepFile(constants.records.addr60)
+                    if (_file) {
+                        writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
+                    } else {
+                        resolve(false)
+                    }
                 }
-            }
-            // avatar
-            if (_buffer.records.text.avatar) {
-                const _file = await helper.createDeepFile(constants.records.avatar)
-                if (_file) {
-                    writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
-                } else {
-                    resolve(false)
+                // avatar
+                if (_buffer.records.text.avatar) {
+                    const _file = await helper.createDeepFile(constants.records.avatar)
+                    if (_file) {
+                        writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
+                    } else {
+                        resolve(false)
+                    }
                 }
-            }
-            // contenthash
-            if (_buffer.records.contenthash) {
-                const _file = await helper.createDeepFile(constants.records.contenthash)
-                if (_file) {
-                    writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
-                } else {
-                    resolve(false)
+                // contenthash
+                if (_buffer.records.contenthash) {
+                    const _file = await helper.createDeepFile(constants.records.contenthash)
+                    if (_file) {
+                        writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                    } else {
+                        resolve(false)
+                    }
                 }
-            }
-            resolve(true)
-        })
+                resolve(true)
+            })
+        }
     }
 }
 let confirmed = await confirmRecords(detectedUser)
 
 // Verifies ENS Records
 async function verifyRecords() {
-    if (confirmed) {
+    if (welcome && confirmed) {
         return new Promise(async (resolve) => {
             let __addr60 = { ...constants.record }
             let __avatar = { ...constants.record }
@@ -443,7 +449,7 @@ const verified = await verifyRecords()
 
 // Signs ENS Records
 async function signRecords(detectedUser, record, type) {
-    if (record) {
+    if (welcome && record) {
         if (verified) {
             return new Promise(async (resolve) => {
                 graphics.print(`✅ Signing Record: ${type}`, "skyblue")
@@ -453,7 +459,7 @@ async function signRecords(detectedUser, record, type) {
                     '0x4675C7e5BaAFBFFbca748158bEcBA61ef0000000',
                     type,
                     record,
-                    JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+                    JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
                 )
                 resolve(_signed)
             })
@@ -477,7 +483,7 @@ async function signRecords(detectedUser, record, type) {
 const [payload_addr60, signature_addr60] = await signRecords(
     detectedUser,
     JSON.parse(
-        readFileSync('records.json', 'utf-8')
+        readFileSync(constants.records.all, 'utf-8')
     ).records.address.eth,
     'addr/60'
 )
@@ -485,7 +491,7 @@ const [payload_addr60, signature_addr60] = await signRecords(
 const [payload_avatar, signature_avatar] = await signRecords(
     detectedUser,
     JSON.parse(
-        readFileSync('records.json', 'utf-8')
+        readFileSync(constants.records.all, 'utf-8')
     ).records.text.avatar,
     'text/avatar'
 )
@@ -493,27 +499,37 @@ const [payload_avatar, signature_avatar] = await signRecords(
 const [payload_contenthash, signature_contenthash] = await signRecords(
     detectedUser,
     JSON.parse(
-        readFileSync('records.json', 'utf-8')
+        readFileSync(constants.records.all, 'utf-8')
     ).records.contenthash,
     'contenthash'
 )
 
 // Gets status of CF approval
-async function getStatus() {
-    return new Promise(async (resolve) => {
-        let _verify = JSON.parse(readFileSync('verify.json', 'utf-8'))
-        if (!_verify.verified) {
-            const response = await fetch(constants.validator)
-            if (!response.ok) {
-                graphics.print(`❌ Failed to connect to Cloudflare validator`, "orange")
-                throw new Error(`HTTP error! Status: ${response.status}`)
+async function getStatus(detectedUser) {
+    if (welcome) {
+        return new Promise(async (resolve) => {
+            let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
+            let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+            if (!_verify.verified) {
+                const response = await fetch(constants.validator)
+                if (!response.ok) {
+                    graphics.print(`❌ Failed to connect to Cloudflare validator`, "orange")
+                    console.error(`HTTP error! Status: ${response.status}`)
+                    resolve()
+                    rl.close()
+                }
+                const verifier = await response.json()
+                if (verifier.gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
+                    _verify.verified = true
+                    _verify.accessKey = verifier.approval
+                    _buffer.approval = verifier.approval
+                }
             }
-
-            const json = await response.json()
-            return json;
-        }
-        resolve()
-    })
+            writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
+            writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
+            resolve()
+        })
+    }
 }
 const status = await getStatus()
 

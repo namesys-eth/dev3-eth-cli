@@ -40,6 +40,7 @@ const record = {
 }
 
 const validator = 'https://dev3.namesys.xyz/verify/'
+const verify = 'verify.json'
 
 export default {
   githubIDRegex,
@@ -52,5 +53,6 @@ export default {
   onionRegex,
   records,
   record,
-  validator
+  validator,
+  verify
 }
