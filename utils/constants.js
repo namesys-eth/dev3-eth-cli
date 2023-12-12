@@ -33,10 +33,10 @@ const records = {
 const record = {
   data: null,
   value: null,
-  manager: null,
+  signer: null,
   signature: null,
   approved: false,
-  approver: null 
+  approval: null 
 }
 
 const validator = 'https://dev3.namesys.xyz/verify/'

@@ -212,7 +212,7 @@ async function gitCommitPush(configured, branch, githubKey, detectedUser) {
                 if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
                     const _pushed = await helper.gitCommitPushConfig(branch, timestamp, githubKey)
                     resolve(_pushed)
-                    graphics.print(`🎉 Successfully configured ENS-on-Github with DEV3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run publish\'`, "lightgreen")
+                    graphics.print(`🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run publish\'`, "lightgreen")
                     graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {

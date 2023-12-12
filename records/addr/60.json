@@ -1,8 +1,8 @@
 {
   "data": null,
   "value": "0xdAC17F958D2ee523a2206206994597C13D831000",
-  "manager": null,
+  "signer": null,
   "signature": null,
   "approved": false,
-  "approver": null
+  "approval": null
 }

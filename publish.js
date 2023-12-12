@@ -6,6 +6,7 @@ import graphics from './utils/graphics.js'
 import helper from './utils/helper.js'
 import fs, { writeFileSync, readFileSync, existsSync } from 'fs'
 import { createRequire } from 'module'
+import { execSync } from 'child_process'
 const require = createRequire(import.meta.url)
 require('dotenv').config()
 
@@ -472,9 +473,8 @@ async function signRecords(detectedUser, record, type) {
         }
     } else {
         return new Promise(async (resolve) => {
-            graphics.print(`❎ Skipping Record: ${type}`, "skyblue")
+            graphics.print(`🚮 Skipping Record: ${type}`, welcome ? "skyblue" : "orange")
             resolve([null, null])
-            rl.close()
         })
     }
 }
@@ -511,41 +511,66 @@ async function getStatus(detectedUser) {
             let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
             let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
             if (!_verify.verified) {
-                const response = await fetch(constants.validator)
+                graphics.print(`🧪 Waiting for validation from Cloudflare...`, "lightblue")
+                const _url = `${constants.validator}${detectedUser}`
+                const response = await fetch(_url)
                 if (!response.ok) {
-                    graphics.print(`❌ Failed to connect to Cloudflare validator`, "orange")
-                    console.error(`HTTP error! Status: ${response.status}`)
-                    resolve()
+                    graphics.print(`❗ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
+                    graphics.print(`❌ Quitting...`, "orange")
                     rl.close()
+                    resolve(false)
                 }
                 const verifier = await response.json()
                 if (verifier.gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
                     _verify.verified = true
                     _verify.accessKey = verifier.approval
                     _buffer.approval = verifier.approval
+                    // addr60
+                    if (_buffer.records.address.eth) {
+                        let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
+                        _addr60.signer = _verify.signer
+                        _addr60.signature = signature_addr60
+                        _addr60.approved = true
+                        _addr60.approval = verifier.approval
+                        writeFileSync(constants.records.addr60, JSON.stringify(_addr60, null, 2))
+                    }
+                    // avatar
+                    if (_buffer.records.text.avatar) {
+                        let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
+                        _avatar.signer = _verify.signer
+                        _avatar.signature = signature_avatar
+                        _avatar.approved = true
+                        _avatar.approval = verifier.approval
+                        writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
+                    }
+                    // contenthash
+                    if (_buffer.records.contenthash) {
+                        let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
+                        _contenthash.signer = _verify.signer
+                        _contenthash.signature = signature_contenthash
+                        _contenthash.approved = true
+                        _contenthash.approval = verifier.approval
+                        writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
+                    }
+                } else {
+                    graphics.print(`❗ Cloudflare validation failed: Signer DOES NOT match!`, "orange")
+                    graphics.print(`❌ Quitting...`, "orange")
+                    rl.close()
+                    resolve(false)
                 }
             }
             writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
             writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
-            resolve()
+            graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
+            let _container = `.well-known/eth/dev3/${detectedUser}`
+            execSync(`rm -r ${_container}`)
+            execSync(`mkdir -p ${_container}`)
+            execSync(`cp -r records/* ${_container}`)
+            resolve(true)
         })
     }
 }
-const status = await getStatus()
-
-// Gets CF approval
-async function validateWithCF() {
-    if (status) {
-        return new Promise(async (resolve) => {
-            resolve()
-        })
-    } else {
-        return new Promise(async (resolve) => {
-            resolve()
-        })
-    }
-}
-const validated = await validateWithCF()
+const validated = await getStatus(detectedUser)
 
 // Try Git Commit & Push
 async function gitCommitPush(signed, branch, githubKey, detectedUser) {
@@ -563,7 +588,7 @@ async function gitCommitPush(signed, branch, githubKey, detectedUser) {
                 if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
                     const _pushed = await helper.gitCommitPushRecords(branch, timestamp)
                     resolve(_pushed)
-                    graphics.print(`🎉 Successfully updated signed ENS Records with DEV3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`, "lightgreen")
+                    graphics.print(`🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`, "lightgreen")
                     graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {

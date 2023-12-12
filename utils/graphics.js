@@ -190,8 +190,8 @@ const colors = {
   magenta: "\x1b[35m",
   cyan: "\x1b[36m",
   white: "\x1b[37m",
-  lightgreen: "\x1b[92m", 
-  orange: "\x1b[91m", 
+  lightgreen: "\x1b[92m",
+  orange: "\x1b[91m",
   skyblue: "\x1b[96m",
 };
 

@@ -72,8 +72,8 @@ async function getGitRepo() {
     const usernameMatch = remoteUrl.match(/github\.com[:/](\w+[-_]?\w+)/)
     if (usernameMatch) {
       return [
-        usernameMatch[1], 
-        branch, 
+        usernameMatch[1],
+        branch,
         signingKey
       ]
     } else {
