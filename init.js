@@ -216,6 +216,8 @@ async function gitCommitPush(configured, branch, githubKey, detectedUser) {
                     graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
+                    graphics.print(`👋 OK, BYEE!`, "lightgreen")
+                    rl.close()
                     resolve(false)
                 } else {
                     graphics.print('⛔ Bad Input', "orange")

@@ -453,7 +453,7 @@ async function signRecords(detectedUser, record, type) {
     if (welcome && record) {
         if (verified) {
             return new Promise(async (resolve) => {
-                graphics.print(`✅ Signing Record: ${type}`, "skyblue")
+                graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
                 const _signed = helper.signRecord(
                     `https://${detectedUser}.github.io`,
                     '1',
@@ -511,7 +511,7 @@ async function getStatus(detectedUser) {
             let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
             let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
             if (!_verify.verified) {
-                graphics.print(`🧪 Waiting for validation from Cloudflare...`, "lightblue")
+                graphics.print(`🧪 Waiting for validation from Cloudflare...`, "skyblue")
                 const _url = `${constants.validator}${detectedUser}`
                 const response = await fetch(_url)
                 if (!response.ok) {
@@ -525,6 +525,8 @@ async function getStatus(detectedUser) {
                     _verify.verified = true
                     _verify.accessKey = verifier.approval
                     _buffer.approval = verifier.approval
+                    graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
+                    graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
                     // addr60
                     if (_buffer.records.address.eth) {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
@@ -558,10 +560,12 @@ async function getStatus(detectedUser) {
                     rl.close()
                     resolve(false)
                 }
+            } else {
+                graphics.print(`🧪 Records already verified by Cloudflare...`, "skyblue")
+                graphics.print(`🧪 Writing records to \'.well-known/eth/dev3/${detectedUser}\'...`, "skyblue")
             }
             writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
             writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
-            graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
             let _container = `.well-known/eth/dev3/${detectedUser}`
             execSync(`rm -r ${_container}`)
             execSync(`mkdir -p ${_container}`)
@@ -592,6 +596,8 @@ async function gitCommitPush(signed, branch, githubKey, detectedUser) {
                     graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
+                    graphics.print(`👋 OK, BYEE!`, "lightgreen")
+                    rl.close()
                     resolve(false)
                 } else {
                     graphics.print('⛔ Bad Input', "orange")
