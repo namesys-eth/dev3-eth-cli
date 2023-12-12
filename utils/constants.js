@@ -24,6 +24,7 @@ const dogeRegex = /^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{24,33}$/
 const solRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
 const atomRegex = /^cosmos1[a-zA-Z0-9]{38}$/
 const records = {
+  all: 'records.json',
   addr60: 'records/addr/60.json',
   avatar: 'records/text/avatar.json',
   contenthash: 'records/contenthash.json'
@@ -38,6 +39,7 @@ const record = {
   approver: null 
 }
 
+const validator = 'https://dev3.namesys.xyz/verify/'
 
 export default {
   githubIDRegex,
@@ -49,5 +51,6 @@ export default {
   ipfsRegexCID1,
   onionRegex,
   records,
-  record
+  record,
+  validator
 }

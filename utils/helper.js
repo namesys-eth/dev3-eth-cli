@@ -1,4 +1,6 @@
-import fs, { writeFileSync, readFileSync, existsSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync, statSync } from 'fs'
+import fs from 'fs/promises'
+import path from 'path'
 import axios from 'axios'
 import constants from './constants.js'
 import graphics from './graphics.js'
@@ -9,6 +11,21 @@ const require = createRequire(import.meta.url)
 require('dotenv').config()
 
 const SIGNER = process.env.SIGNER
+
+// Creates a deep file
+async function createDeepFile(filePath) {
+  try {
+    const directory = path.dirname(filePath)
+    await fs.mkdir(directory, { recursive: true })
+    await fs.writeFile(filePath, JSON.stringify(constants.record, null, 2))
+    graphics.print(`🧪 Made record file: ${filePath}`, "skyblue")
+    return true
+  } catch (error) {
+    console.log(error)
+    graphics.print(`❌ Error creating file: ${filePath}`, "orange")
+    return false
+  }
+}
 
 // Checks if GitHub user exists with given GitHub ID
 async function githubIDExists(username) {
@@ -37,7 +54,7 @@ function isValidSigner(signingKey) {
 // Checks if current directory is Git repository
 function isGitRepo() {
   try {
-    fs.statSync('.git')
+    statSync('.git')
     return true
   } catch (error) {
     return false
@@ -161,6 +178,7 @@ async function signRecord(gateway, chainID, resolver, recordType, extradata, sig
 }
 
 export default {
+  createDeepFile,
   githubIDExists,
   isValidGithubID,
   isValidSigner,

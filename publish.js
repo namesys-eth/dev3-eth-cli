@@ -41,10 +41,10 @@ function validateGitRepo() {
         const _isGitRepo = helper.isGitRepo()
         if (_isGitRepo) {
             const [_username, _branch, _githubKey] = await helper.getGitRepo()
-            graphics.print('✅ Valid Git Repository', "lightgreen")
+            graphics.print('✅ Valid git repository', "lightgreen")
             const _synced = !await helper.isRemoteAhead(_branch)
             if (_synced) {
-                graphics.print('✅ Remote Tip is in Sync', "lightgreen")
+                graphics.print('✅ Remote tip is in sync', "lightgreen")
                 resolve([
                     _isGitRepo,
                     _username,
@@ -65,11 +65,11 @@ function validateGitRepo() {
                 rl.close()
             }
         } else {
-            graphics.print(`❌ Not a Git Repository! Please initialise and configure as Git repository, then run \'npm run init\'. Quitting...`, "orange")
+            graphics.print(`❌ Not a git repository! Please initialise and configure as git repository first, and then run \'npm run init\'. Quitting...`, "orange")
             graphics.print(`❗ PRE-REQUISITES:`, "orange")
-            graphics.print(`👉 Please make sure that Git repository is initialised and configured to push to remote branch on GitHub`, "orange")
+            graphics.print(`👉 Please make sure that git repository is initialised and configured to push to remote branch on github`, "orange")
             graphics.print(` ◥ https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "skyblue")
-            graphics.print(`👉 Please make sure that GitHub Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+            graphics.print(`👉 Please make sure that Github Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
             graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve([
                 _isGitRepo,
@@ -82,10 +82,10 @@ function validateGitRepo() {
     })
 }
 
-// Request GitHub ID for login
+// Request Github ID for login
 function requestGithubID(detectedUser) {
     return new Promise((resolve) => {
-        rl.question(`⏰ Detected GitHub ID: ${detectedUser}. Confirm? [Y/N]: `, async (agree) => {
+        rl.question(`⏰ Detected Github ID: ${detectedUser}. Confirm? [Y/N]: `, async (agree) => {
             if (agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
                 resolve(true)
             } else if (agree.toLowerCase() === 'n' || agree.toLowerCase() === 'no') {
@@ -98,53 +98,53 @@ function requestGithubID(detectedUser) {
     })
 }
 
-// Validates GitHub ID for login
+// Validates Github ID for login
 function validateGithubID() {
     return new Promise((resolve) => {
-        rl.question('⏰ Please Enter Your GitHub ID: ', async (githubID) => {
+        rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
             if (helper.isValidGithubID(githubID)) {
                 const _githubIDExists = await helper.githubIDExists(githubID)
                 if (_githubIDExists) {
                     graphics.print(`👋 Welcome, ${githubID}!`, "yellow")
                     const _ghpages = await helper.isGHPConfigured(githubID)
                     if (_ghpages) {
-                        graphics.print(`✅ GitHub Page exists: https://${githubID}.github.io/`, "lightgreen")
-                        graphics.print(`👉 Please make sure that GitHub Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+                        graphics.print(`✅ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
+                        graphics.print(`👉 Please make sure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
                         graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
                         resolve(true) // Resolve the promise with true
                     } else {
-                        graphics.print(`❌ GitHub Page DOES NOT exist: https://${githubID}.github.io/`, "orange")
-                        graphics.print(`👉 Please make sure that GitHub Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+                        graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/`, "orange")
+                        graphics.print(`👉 Please make sure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
                         graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
                         graphics.print(`❌ Quitting...`, "orange")
                         resolve(false) // Resolve the promise with false
                     }
                 } else {
-                    graphics.print('❌ GitHub ID Not Found! Please try again OR press CTRL + C to exit', "orange")
+                    graphics.print('❌ Github ID Not Found! Please try again OR press CTRL + C to exit', "orange")
                     resolve(await validateGithubID()) // Recursive call to prompt for GithubID again
                 }
             } else {
-                graphics.print('❌ Invalid GitHub ID! Please try again OR press CTRL + C to exit', "orange")
+                graphics.print('❌ Invalid Github ID! Please try again OR press CTRL + C to exit', "orange")
                 resolve(await validateGithubID()) // Recursive call to prompt for GithubID again
             }
         })
     })
 }
 
-// Skip GitHub ID for login
+// Skip Github ID for login
 function skipGithubID(detectedUser) {
     return new Promise(async (resolve) => {
-        graphics.print(`🧪 Continuing with GitHub ID: ${detectedUser}`, "skyblue")
+        graphics.print(`🧪 Continuing with Github ID: ${detectedUser}`, "skyblue")
         graphics.print(`👋 Welcome, ${detectedUser}!`, "yellow")
         const _ghpages = await helper.isGHPConfigured(detectedUser)
         if (_ghpages) {
-            graphics.print(`✅ GitHub Page exists: https://${detectedUser}.github.io/`, "lightgreen")
-            graphics.print(`👉 Please make sure that GitHub Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+            graphics.print(`✅ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
+            graphics.print(`👉 Please make sure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
             graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve(true)
         } else {
-            graphics.print(`❌ GitHub Page DOES NOT exist: https://${detectedUser}.github.io/`, "orange")
-            graphics.print(`👉 Please make sure that GitHub Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+            graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/`, "orange")
+            graphics.print(`👉 Please make sure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
             graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             graphics.print(`❌ Quitting...`, "orange")
             resolve(false)
@@ -178,12 +178,12 @@ let contenthash = [
 async function writeRecords() {
     if (welcome) {
         return new Promise(async (resolve) => {
-            graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in their respective JSON files`, "skyblue")
+            graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
             rl.question('⏰ Continue in next step? [Y] OR, Update Manually? [N]: ', async (auto) => {
                 if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
                     resolve(true)
                 } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
-                    rl.question(`⌛ Please manually edit \'value:\' keys in JSON files, save them and then press ENTER: `, async (done) => {
+                    rl.question(`⌛ Please manually edit record keys in \'records.json\' file, save them and then press ENTER: `, async (done) => {
                         resolve(false)
                     })
                 } else {
@@ -284,130 +284,236 @@ let [written_contenthash, _contenthash] = await write_contenthash(contenthash)
 contenthash = _contenthash
 
 // Confirms ENS Records
-async function confirmRecords() {
+async function confirmRecords(detectedUser) {
     if (written && written_addr60 && written_avatar && written_contenthash) {
         return new Promise(async (resolve) => {
             rl.question('⏰ Confirm Records Update? [Y/N]: ', async (_write) => {
                 if (_write.toLowerCase() === 'y' || _write.toLowerCase() === 'yes') {
                     graphics.print(`🧪 Processing...`, "skyblue")
-                    if (addr60[0].value) writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
-                    if (avatar[0].value) writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
-                    if (contenthash[0].value) writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                    let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                    // addr60
+                    if (addr60[0].value) {
+                        const _file = await helper.createDeepFile(constants.records.addr60)
+                        if (_file) writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
+                        _buffer.records.address.eth = addr60[0].value
+                    }
+                    // avatar
+                    if (avatar[0].value) {
+                        const _file = await helper.createDeepFile(constants.records.avatar)
+                        if (_file) writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
+                        _buffer.records.text.avatar = avatar[0].value
+                    }
+                    // contenthash
+                    if (contenthash[0].value) {
+                        const _file = await helper.createDeepFile(constants.records.contenthash)
+                        if (_file) writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                        _buffer.records.contenthash = contenthash[0].value
+                    }
+                    // githubid
+                    _buffer.githubid = detectedUser
+                    // signer
+                    _buffer.signer = JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+                    writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
                     resolve(true)
                 } else if (_write.toLowerCase() === 'n' || _write.toLowerCase() === 'no') {
                     graphics.print(`❌ Quitting...`, "orange")
                     resolve(false) // Recursive call
                 } else {
                     graphics.print('⛔ Bad Input', "orange")
-                    resolve(await writeRecords()) // Recursive call
+                    resolve(await confirmRecords()) // Recursive call
                 }
             })
         })
     } else {
         return new Promise(async (resolve) => {
-            resolve(false)
+            let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+            _buffer.githubid = detectedUser
+            _buffer.signer = JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+            // Read from buffer
+            addr60[0].value = _buffer.records.address.eth
+            avatar[0].value = _buffer.records.text.avatar
+            contenthash[0].value = _buffer.records.contenthash
+            writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
+            // addr60
+            if (_buffer.records.address.eth) {
+                const _file = await helper.createDeepFile(constants.records.addr60)
+                if (_file) {
+                    writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
+                } else {
+                    resolve(false)
+                }
+            }
+            // avatar
+            if (_buffer.records.text.avatar) {
+                const _file = await helper.createDeepFile(constants.records.avatar)
+                if (_file) {
+                    writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
+                } else {
+                    resolve(false)
+                }
+            }
+            // contenthash
+            if (_buffer.records.contenthash) {
+                const _file = await helper.createDeepFile(constants.records.contenthash)
+                if (_file) {
+                    writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                } else {
+                    resolve(false)
+                }
+            }
+            resolve(true)
         })
     }
 }
-let confirmed = await confirmRecords()
+let confirmed = await confirmRecords(detectedUser)
 
 // Verifies ENS Records
 async function verifyRecords() {
-    //if (!confirmed && !written && !written_addr60 && !written_avatar && !written_contenthash) {
-    return new Promise(async (resolve) => {
-        const __addr60 = existsSync(constants.records.addr60) ? JSON.parse(readFileSync(constants.records.addr60, 'utf-8')) : constants.record
-        const __avatar = existsSync(constants.records.avatar) ? JSON.parse(readFileSync(constants.records.avatar, 'utf-8')) : constants.record
-        const __contenthash = existsSync(constants.records.contenthash) ? JSON.parse(readFileSync(constants.records.contenthash, 'utf-8')) : constants.record
-        // validity flags
-        var flag = {
-            addr60: false,
-            avatar: false,
-            contenthash: false
-        }
-        // addr60
-        if (__addr60 && __addr60.value !== null && constants.addressRegex.test(__addr60.value.slice(2))) { // strip '0x'
-            flag.addr60 = true
-        } else {
-            graphics.print('❗ Bad Value in addr/60. Please check \'value:\' key in \'records/addr/60.json\'', "orange")
-        }
-        // avatar
-        if (__avatar && __avatar.value !== null && constants.urlRegex.test(__avatar.value)) {
-            flag.avatar = true
-        } else {
-            graphics.print('❗ Bad Value in text/avatar. Please check \'value:\' key in \'records/text/avatar.json\'', "orange")
-        }
-        // contenthash
-        if (__contenthash &&
-            __contenthash.value !== null &&
-            (
-                constants.ipnsRegex.test(__contenthash.value.slice(7)) || // strip 'ipns://'
-                constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
-                constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
-                constants.onionRegex.test(__contenthash.value.slice(8)) // strip 'onion://'
-            )
-        ) {
-            flag.contenthash = true
-        } else {
-            graphics.print('❗ Bad Contenthash Value. Please check \'value:\' key in \'records/contenthash.json\'', "orange")
-        }
-        /* add more ENS Records here */
-        if (Object.values(flag).every(value => value === true)) {
-            graphics.print(`✅ Record Files Verified!`, "lightgreen")
-            resolve(true)
-        } else {
-            graphics.print(`❗ Record Files Failed Verification!`, "orange")
-            resolve(false)
-        }
-    })
-    /*   
+    if (confirmed) {
+        return new Promise(async (resolve) => {
+            let __addr60 = { ...constants.record }
+            let __avatar = { ...constants.record }
+            let __contenthash = { ...constants.record }
+            if (existsSync(constants.records.all)) {
+                let records = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                __addr60.value = records.records.address.eth || null
+                __avatar.value = records.records.text.avatar || null
+                __contenthash.value = records.records.contenthash || null
+            }
+            // validity flags
+            var flag = {
+                addr60: false,
+                avatar: false,
+                contenthash: false
+            }
+            // addr60
+            if (__addr60.value && __addr60.value !== null && constants.addressRegex.test(__addr60.value.slice(2))) { // strip '0x'
+                flag.addr60 = true
+            } else if (!__addr60.value || __addr60.value === null) {
+                flag.addr60 = true
+                graphics.print('🧪 Empty \'addr60:\' value in \'records.json\'', "skyblue")
+            } else {
+                graphics.print('❗ Bad \'addr60:\' value in \'records.json\'', "orange")
+            }
+            // avatar
+            if (__avatar.value && __avatar.value !== null && constants.urlRegex.test(__avatar.value)) {
+                flag.avatar = true
+            } else if (!__avatar.value || __avatar.value === null) {
+                flag.avatar = true
+                graphics.print('🧪 Empty \'avatar:\' value in \'records.json\'', "skyblue")
+            } else {
+                graphics.print('❗ Bad \'avatar:\' value in \'records.json\'', "orange")
+            }
+            // contenthash
+            if (__contenthash.value &&
+                __contenthash.value !== null &&
+                (
+                    constants.ipnsRegex.test(__contenthash.value.slice(7)) || // strip 'ipns://'
+                    constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
+                    constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
+                    constants.onionRegex.test(__contenthash.value.slice(8)) // strip 'onion://'
+                )
+            ) {
+                flag.contenthash = true
+            } else if (!__contenthash.value || __contenthash.value === null) {
+                flag.contenthash = true
+                graphics.print('🧪 Empty \'contenthash:\' value in \'records.json\'', "skyblue")
+            } else {
+                graphics.print('❗ Bad \'contenthash:\' value in \'records.json\'', "orange")
+            }
+            /* add more ENS Records here */
+            if (Object.values(flag).every(value => value === true)) {
+                graphics.print(`✅ Records verified!`, "lightgreen")
+                resolve(true)
+            } else {
+                graphics.print(`❗ Records failed verification!`, "orange")
+                resolve(false)
+            }
+        })
     } else {
         return new Promise(async (resolve) => {
-            resolve(true) // Skip verification
+            graphics.print(`❗ Records failed to write due to unknown reason!`, "orange")
+            graphics.print(`❌ Quitting...`, "orange")
+            resolve(false)
+            rl.close()
         })
     }
-    */
 }
 const verified = await verifyRecords()
 
 // Signs ENS Records
-async function signRecords(record, type) {
-    if (verified) {
-        return new Promise(async (resolve) => {
-            graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
-            const _signed = helper.signRecord(
-                'https://gateway.com',
-                '1',
-                '0x4675C7e5BaAFBFFbca748158bEcBA61ef0000000',
-                type,
-                record.value,
-                JSON.parse(readFileSync('verify.json', 'utf-8')).signer
-            )
-            resolve(_signed)
-        })
+async function signRecords(detectedUser, record, type) {
+    if (record) {
+        if (verified) {
+            return new Promise(async (resolve) => {
+                graphics.print(`✅ Signing Record: ${type}`, "skyblue")
+                const _signed = helper.signRecord(
+                    `https://${detectedUser}.github.io`,
+                    '1',
+                    '0x4675C7e5BaAFBFFbca748158bEcBA61ef0000000',
+                    type,
+                    record,
+                    JSON.parse(readFileSync('verify.json', 'utf-8')).signer
+                )
+                resolve(_signed)
+            })
+        } else {
+            return new Promise(async (resolve) => {
+                graphics.print(`❌ Please fix the ${type} record & then re-try \'npm run publish\'. Quitting...`, "orange")
+                resolve([null, null])
+                rl.close()
+            })
+        }
     } else {
         return new Promise(async (resolve) => {
-            graphics.print('❌ Please fix the Records files & then re-try \'npm run publish\'. Quitting...', "orange")
+            graphics.print(`❎ Skipping Record: ${type}`, "skyblue")
             resolve([null, null])
             rl.close()
         })
     }
 }
-const [payload_addr60, signature_addr60] = await signRecords(addr60, 'addr/60')
-const [payload_avatar, signature_avatar] = await signRecords(avatar, 'text/avatar')
-const [payload_contenthash, signature_contenthash] = await signRecords(contenthash, 'contenthash')
+
+// Sign addr60
+const [payload_addr60, signature_addr60] = await signRecords(
+    detectedUser,
+    JSON.parse(
+        readFileSync('records.json', 'utf-8')
+    ).records.address.eth,
+    'addr/60'
+)
+// Sign avatar
+const [payload_avatar, signature_avatar] = await signRecords(
+    detectedUser,
+    JSON.parse(
+        readFileSync('records.json', 'utf-8')
+    ).records.text.avatar,
+    'text/avatar'
+)
+// Sign contenthash
+const [payload_contenthash, signature_contenthash] = await signRecords(
+    detectedUser,
+    JSON.parse(
+        readFileSync('records.json', 'utf-8')
+    ).records.contenthash,
+    'contenthash'
+)
 
 // Gets status of CF approval
 async function getStatus() {
-    if (signature_addr60 && signature_avatar && signature_contenthash) {
-        return new Promise((resolve) => {
-            rl.close()
-            resolve()
-        })
-    } else {
-        return new Promise(async (resolve) => {
-            resolve()
-        })
-    }
+    return new Promise(async (resolve) => {
+        let _verify = JSON.parse(readFileSync('verify.json', 'utf-8'))
+        if (!_verify.verified) {
+            const response = await fetch(constants.validator)
+            if (!response.ok) {
+                graphics.print(`❌ Failed to connect to Cloudflare validator`, "orange")
+                throw new Error(`HTTP error! Status: ${response.status}`)
+            }
+
+            const json = await response.json()
+            return json;
+        }
+        resolve()
+    })
 }
 const status = await getStatus()
 
@@ -425,23 +531,23 @@ async function validateWithCF() {
 }
 const validated = await validateWithCF()
 
-// Attempt Git Commit & Push
+// Try Git Commit & Push
 async function gitCommitPush(signed, branch, githubKey, detectedUser) {
     if (validated) {
         return new Promise(async (resolve) => {
             const timestamp = Date.now()
-            graphics.print(`🧪 Detected Branch: ${branch}`, "skyblue")
+            graphics.print(`🧪 Detected branch: ${branch}`, "skyblue")
             if (githubKey) {
-                graphics.print(`🧪 Detected Signature Fingerprint: ${githubKey}`, "skyblue")
-                graphics.print(`🧪 Attempting auto-update: git add verify.json .well-known; git commit -S -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+                graphics.print(`🧪 Detected signature fingerprint: ${githubKey}`, "skyblue")
+                graphics.print(`🧪 Trying auto-update: git add verify.json .well-known; git commit -S -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
             } else {
-                graphics.print(`🧪 Attempting auto-update: git add verify.json .well-known; git commit -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+                graphics.print(`🧪 Trying auto-update: git add verify.json .well-known; git commit -m "dev3 publish: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
             }
-            rl.question(`⏰ Attempt Git Commit & Push? [Y/N]: `, async (attempt) => {
+            rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
                 if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
                     const _pushed = await helper.gitCommitPushRecords(branch, timestamp)
                     resolve(_pushed)
-                    graphics.print(`🎉 Successfully Updated Signed Records with DEV3.eth! To check your Signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`, "lightgreen")
+                    graphics.print(`🎉 Successfully updated signed ENS Records with DEV3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`, "lightgreen")
                     graphics.print(`👋 BYEE!`, "lightgreen")
                     rl.close()
                 } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {

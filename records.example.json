@@ -1,0 +1,19 @@
+{
+    "githubid": "github username of a personal account or an organisation's account",
+    "signer": "0xaddress of Records Signer",
+    "approvedSig": "approval signature from cloudflare worker for signer",
+    "records": {
+        "contenthash": "ipfs://, ipns:// or onion:// CID",
+        "address": {
+            "eth": "0xaddress",
+            "btc": "1address"
+        },
+        "text": {
+            "avatar": "ipfs:// or https:// URL to image, OR eip155:1:eip721:<contract>:<tokenID>",
+            "description": "a short description",
+            "url": "https:// URL",
+            "com.github": "github",
+            "com.x": "x"
+        }
+    }
+}

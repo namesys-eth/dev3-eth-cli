@@ -1,0 +1,14 @@
+{
+  "signer": "0xC535D0848F33a9Cb9B73cAAd43c5F73F6632e8dD",
+  "approvedSig": null,
+  "records": {
+    "contenthash": null,
+    "address": {
+      "eth": "0xdAC17F958D2ee523a2206206994597C13D831000"
+    },
+    "text": {
+      "avatar": null
+    }
+  },
+  "githubid": "namesys-eth"
+}
