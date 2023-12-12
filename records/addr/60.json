@@ -1,8 +1,8 @@
 {
   "data": null,
   "value": "0xdAC17F958D2ee523a2206206994597C13D831000",
-  "signer": "0x78B1e75E93546d38D7fE4414048429Dbe63872e4",
-  "signature": "0x96c8c683cf575d438c7ec000dee3ce19ce25c732f27ddbd9d2ebf4f5d8ffdcde04d1b35e5564af86d3e76b41aa0dce5670124395a736ed6f01b821be348974e41c",
-  "approved": true,
-  "approval": "0xbedab8984b33e8915c05db4848d1e50f87c602e5d42724115737ac24e63ce32a5fc44e2b65c737bef71a18239ea05a89bbb858b1abb453705a051e67b7a49b9c1c"
+  "signer": null,
+  "signature": null,
+  "approved": false,
+  "approval": null
 }
