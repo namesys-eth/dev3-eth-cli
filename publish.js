@@ -22,7 +22,7 @@ graphics.logo()
 graphics.print(graphics.publishAsciiArt, 'orange')
 console.log()
 
-const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo()
+const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
 let userDetected = undefined
 if (isGitRepo && detectedUser && synced) {
     userDetected = await helper.requestGithubID(detectedUser, rl)
@@ -47,159 +47,11 @@ let contenthash = [
 ]
 /* Define more ENS Records here */
 
-// Initiates writing ENS Records
-async function writeRecords() {
-    if (welcome) {
-        return new Promise(async (resolve) => {
-            graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
-            rl.question('⏰ Continue in next step? [Y] OR, Update Manually? [N]: ', async (auto) => {
-                if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
-                    resolve(true)
-                } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
-                    rl.question(`⌛ Please manually edit record keys in \'records.json\' file, save them and then press ENTER: `, async (done) => {
-                        resolve(false)
-                    })
-                } else {
-                    graphics.print('⛔ Bad Input', "orange")
-                    resolve(await writeRecords()) // Recursive call
-                }
-            })
-        })
-    }
-}
-let written = await writeRecords()
-
-// Writes ENS Records: addr60
-async function write_addr60(_addr60_) {
-    if (welcome && written) {
-        return new Promise(async (resolve) => {
-            rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
-                if (_addr60) {
-                    if (constants.addressRegex.test(_addr60.slice(2))) {  // strip '0x'
-                        _addr60_[0].value = _addr60
-                        resolve([true, _addr60_])
-                    } else {
-                        graphics.print('⛔ Bad Input', "orange")
-                        resolve(await write_addr60()) // Recursive call
-                    }
-                } else {
-                    _addr60_[0].value = null
-                    resolve([true, _addr60_])
-                }
-            })
-        })
-    } else {
-        return new Promise(async (resolve) => {
-            resolve([false, _addr60_])
-        })
-    }
-}
-let [written_addr60, _addr60] = await write_addr60(addr60)
-addr60 = _addr60
-// Writes ENS Records: avatar
-async function write_avatar(_avatar_) {
-    if (welcome && written && written_addr60) {
-        return new Promise(async (resolve) => {
-            rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
-                if (_avatar) {
-                    if (constants.urlRegex.test(_avatar)) {
-                        _avatar_[0].value = _avatar
-                        resolve([true, _avatar_])
-                    } else {
-                        graphics.print('⛔ Bad Input', "orange")
-                        resolve(await write_avatar()) // Recursive call
-                    }
-                } else {
-                    _avatar_[0].value = null
-                    resolve([true, _avatar_])
-                }
-            })
-        })
-    } else {
-        return new Promise(async (resolve) => {
-            resolve([false, _avatar_])
-        })
-    }
-}
-let [written_avatar, _avatar] = await write_avatar(avatar)
-avatar = _avatar
-// Writes ENS Records: contenthash
-async function write_contenthash(_contenthash_) {
-    if (welcome && written && written_addr60 && written_avatar) {
-        return new Promise(async (resolve) => {
-            rl.question('📝 Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
-                if (_contenthash) {
-                    if (
-                        constants.ipnsRegex.test(_contenthash.slice(7)) || // strip 'ipns://'
-                        constants.ipfsRegexCID0.test(_contenthash.slice(7)) || // strip 'ipfs://'
-                        constants.ipfsRegexCID0.test(_contenthash.slice(7)) || // strip 'ipfs://'
-                        constants.onionRegex.test(_contenthash.slice(8)) // strip 'onion://'
-                    ) {
-                        _contenthash_[0].value = _contenthash
-                        resolve([true, _contenthash_])
-                    } else {
-                        graphics.print('⛔ Bad Input! Resetting...', "orange")
-                        resolve(await writeRecords()) // Recursive call
-                    }
-                } else {
-                    _contenthash_[0].value = null
-                    resolve([true, _contenthash_])
-                }
-            })
-        })
-    } else {
-        return new Promise(async (resolve) => {
-            resolve([false, _contenthash_])
-        })
-    }
-}
-let [written_contenthash, _contenthash] = await write_contenthash(contenthash)
-contenthash = _contenthash
-
 // Confirms ENS Records
 async function confirmRecords(detectedUser) {
-    if (welcome && written && written_addr60 && written_avatar && written_contenthash) {
+    if (welcome) {
         return new Promise(async (resolve) => {
-            rl.question('⏰ Confirm Records Update? [Y/N]: ', async (_write) => {
-                if (_write.toLowerCase() === 'y' || _write.toLowerCase() === 'yes') {
-                    graphics.print(`🧪 Processing...`, "skyblue")
-                    let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
-                    // addr60
-                    if (addr60[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.addr60)
-                        if (_file) writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
-                        _buffer.records.address.eth = addr60[0].value
-                    }
-                    // avatar
-                    if (avatar[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.avatar)
-                        if (_file) writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
-                        _buffer.records.text.avatar = avatar[0].value
-                    }
-                    // contenthash
-                    if (contenthash[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.contenthash)
-                        if (_file) writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
-                        _buffer.records.contenthash = contenthash[0].value
-                    }
-                    // githubid
-                    _buffer.githubid = detectedUser
-                    // signer
-                    _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
-                    writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
-                    resolve(true)
-                } else if (_write.toLowerCase() === 'n' || _write.toLowerCase() === 'no') {
-                    graphics.print(`❌ Quitting...`, "orange")
-                    resolve(false) // Recursive call
-                } else {
-                    graphics.print('⛔ Bad Input', "orange")
-                    resolve(await confirmRecords()) // Recursive call
-                }
-            })
-        })
-    } else {
-        if (welcome) {
-            return new Promise(async (resolve) => {
+            rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
                 let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
                 _buffer.githubid = detectedUser
                 _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
@@ -237,7 +89,7 @@ async function confirmRecords(detectedUser) {
                 }
                 resolve(true)
             })
-        }
+        })
     }
 }
 let confirmed = await confirmRecords(detectedUser)
