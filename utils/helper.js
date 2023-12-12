@@ -91,7 +91,7 @@ function validateGitRepo(rl) {
     if (_isGitRepo) {
       const [_username, _branch, _githubKey] = await getGitRepo()
       graphics.print('✅ Valid git repository', "lightgreen")
-      const _synced = !await isRemoteAhead(_branch)
+      const _synced = !await isRemoteSynced(_branch)
       if (_synced) {
         graphics.print('✅ Remote tip is in sync', "lightgreen")
         resolve([
@@ -102,7 +102,7 @@ function validateGitRepo(rl) {
           _synced
         ])
       } else {
-        graphics.print(`❗ Cannot proceed further! Remote branch is ahead of local. please \'git merge\' or \'git pull\' to sync with remote tip and then try again`, "orange")
+        graphics.print(`❗ Cannot proceed further! Remote branch is out of sync with local. please \'git push\' or \'git pull\' to sync with remote tip and then try again`, "orange")
         graphics.print(`❌ Please \'git merge\' or \'git pull\' to sync with remote tip and then try again. Quitting...`, "orange")
         rl.close()
         resolve([
@@ -254,7 +254,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
 }
 
 //Checks if remote tip is ahead of local
-async function isRemoteAhead(branch) {
+async function isRemoteSynced(branch) {
   try {
     // Get the commit hash of the local branch
     const localCommit = execSync(`git rev-parse ${branch}`).toString().trim()
@@ -325,7 +325,7 @@ export default {
   getGitRepo,
   writeConfig,
   isGHPConfigured,
-  isRemoteAhead,
+  isRemoteSynced,
   signRecord,
   requestGithubID,
   validateGitRepo,
