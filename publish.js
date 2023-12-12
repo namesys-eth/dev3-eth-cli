@@ -75,7 +75,7 @@ async function write_addr60(_addr60_) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
                 if (_addr60) {
-                    if (constants.addressRegex.test(_addr60.slice(2))) {  // strip '0x'
+                    if (helper.isAddr(_addr60)) {  // strip '0x'
                         _addr60_[0].value = _addr60
                         resolve([true, _addr60_])
                     } else {
@@ -102,7 +102,7 @@ async function write_avatar(_avatar_) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
                 if (_avatar) {
-                    if (constants.urlRegex.test(_avatar)) {
+                    if (helper.isAvatar(_avatar)) {
                         _avatar_[0].value = _avatar
                         resolve([true, _avatar_])
                     } else {
@@ -129,12 +129,7 @@ async function write_contenthash(_contenthash_) {
         return new Promise(async (resolve) => {
             rl.question('📝 Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
                 if (_contenthash) {
-                    if (
-                        constants.ipnsRegex.test(_contenthash.slice(7)) || // strip 'ipns://'
-                        constants.ipfsRegexCID0.test(_contenthash.slice(7)) || // strip 'ipfs://'
-                        constants.ipfsRegexCID0.test(_contenthash.slice(7)) || // strip 'ipfs://'
-                        constants.onionRegex.test(_contenthash.slice(8)) // strip 'onion://'
-                    ) {
+                    if (helper.isContenthash(_contenthash)) {
                         _contenthash_[0].value = _contenthash
                         resolve([true, _contenthash_])
                     } else {
@@ -262,7 +257,7 @@ async function verifyRecords() {
                 contenthash: false
             }
             // addr60
-            if (__addr60.value && __addr60.value !== null && constants.addressRegex.test(__addr60.value.slice(2))) { // strip '0x'
+            if (__addr60.value && __addr60.value !== null && helper.isAddr(__addr60.value)) { // strip '0x'
                 flag.addr60 = true
             } else if (!__addr60.value || __addr60.value === null) {
                 flag.addr60 = true
@@ -271,7 +266,7 @@ async function verifyRecords() {
                 graphics.print('❗ Bad \'addr60:\' value in \'records.json\'', "orange")
             }
             // avatar
-            if (__avatar.value && __avatar.value !== null && constants.urlRegex.test(__avatar.value)) {
+            if (__avatar.value && __avatar.value !== null && helper.isURL(__avatar.value)) {
                 flag.avatar = true
             } else if (!__avatar.value || __avatar.value === null) {
                 flag.avatar = true
@@ -280,15 +275,7 @@ async function verifyRecords() {
                 graphics.print('❗ Bad \'avatar:\' value in \'records.json\'', "orange")
             }
             // contenthash
-            if (__contenthash.value &&
-                __contenthash.value !== null &&
-                (
-                    constants.ipnsRegex.test(__contenthash.value.slice(7)) || // strip 'ipns://'
-                    constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
-                    constants.ipfsRegexCID0.test(__contenthash.value.slice(7)) || // strip 'ipfs://'
-                    constants.onionRegex.test(__contenthash.value.slice(8)) // strip 'onion://'
-                )
-            ) {
+            if (__contenthash.value && __contenthash.value !== null && helper.isContenthash(__contenthash.value)) {
                 flag.contenthash = true
             } else if (!__contenthash.value || __contenthash.value === null) {
                 flag.contenthash = true

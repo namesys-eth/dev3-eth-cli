@@ -61,6 +61,24 @@ function isGitRepo() {
   }
 }
 
+// Check for valid ethereum address
+function isAddr(value) {
+  return constants.addressRegex.test(value.slice(2))
+}
+// Check for valid URL
+function isURL(value) {
+  return constants.urlRegex.test(value)
+}
+// Check for valid ENS Contenthash
+function isContenthash(value) {
+  return (
+    constants.ipnsRegex.test(value.slice(7)) || // strip 'ipns://'
+    constants.ipfsRegexCID0.test(value.slice(7)) || // strip 'ipfs://'
+    constants.ipfsRegexCID0.test(value.slice(7)) || // strip 'ipfs://'
+    constants.onionRegex.test(value.slice(8)) // strip 'onion://'
+  )
+}
+
 // Gets username from Git repository
 async function getGitRepo() {
   try {
@@ -156,7 +174,7 @@ function validateGithubID(rl) {
         const _githubIDExists = await githubIDExists(githubID)
         if (_githubIDExists) {
           graphics.print(`👋 Welcome, ${githubID}!`, "yellow")
-          const _ghpages = await isGHPConfigured(githubID)
+          const _ghpages = await isGithubPagesConfigured(githubID)
           if (_ghpages) {
             graphics.print(`✅ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
             graphics.print(`👉 Please make sure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
@@ -186,7 +204,7 @@ function skipGithubID(detectedUser) {
   return new Promise(async (resolve) => {
     graphics.print(`🧪 Continuing with Github ID: ${detectedUser}`, "skyblue")
     graphics.print(`👋 Welcome, ${detectedUser}!`, "yellow")
-    const _ghpages = await isGHPConfigured(detectedUser)
+    const _ghpages = await isGithubPagesConfigured(detectedUser)
     if (_ghpages) {
       graphics.print(`✅ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
       graphics.print(`👉 Please make sure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
@@ -270,7 +288,7 @@ async function isRemoteSynced(branch) {
 }
 
 // Checks if GitHub Pages is configured
-async function isGHPConfigured(username) {
+async function isGithubPagesConfigured(username) {
   try {
     const response = await axios.get(`https://${username}.github.io/`)
     return response.status === 200 && response.status !== 404
@@ -324,12 +342,15 @@ export default {
   isGitRepo,
   getGitRepo,
   writeConfig,
-  isGHPConfigured,
+  isGithubPagesConfigured,
   isRemoteSynced,
   signRecord,
   requestGithubID,
   validateGitRepo,
   validateGithubID,
   skipGithubID,
-  gitCommitPush
+  gitCommitPush,
+  isAddr,
+  isURL,
+  isContenthash
 }
