@@ -2,50 +2,72 @@
 
 ## Download Package
 
-### `NPM`
+### `GLOBAL` installation with `NPM`
 
 ```bash
-npm install -g @namesys-eth/dev3-eth
+npm i -g dev3-eth
 ```
 
-### `CURL`
+### OR
+
+### `LOCAL` installation with `CURL`
 
 ```bash
-VERSION=0.0.3-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
+VERSION=0.0.4-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE && npm i
 ```
 
-### `WGET`
+### `LOCAL` installation with `WGET`
 
 ```bash
-VERSION=0.0.3-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
+VERSION=0.0.4-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE && npm i
 ```
 
-## Install Package
+## Initialise `dev3.eth` 
+
+### `GLOBAL` install
 
 ```bash
-npm install
-```
-
-## Initialise `dev3.eth`
-
-```bash
-npx dev3 init
+npx dev3-eth init
 ```
 
 > 💡 HINT: If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
+
+### OR
+
+### `LOCAL` install
+
+```bash
+npm run init
+```
 
 ## Set Records for `*.dev3.eth`
 
+### `GLOBAL` install
+
 ```bash
-npx dev3 sign
+npx dev3-eth sign
 ```
 
-> 💡 HINT: If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
+### OR
+
+### `LOCAL` install
+
+```bash
+npm run sign
+```
 
 ## Check Records for `*.dev3.eth`
 
+### `GLOBAL` install
+
 ```bash
-npx dev3 status
+npx dev3-eth status
 ```
 
-> 💡 HINT: If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
+### OR
+
+### `LOCAL` install
+
+```bash
+npm run status
+```
