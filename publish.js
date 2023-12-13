@@ -47,6 +47,110 @@ let contenthash = [
 ]
 /* Define more ENS Records here */
 
+// Initiates writing ENS Records
+async function writeRecords() {
+    if (welcome) {
+        return new Promise(async (resolve) => {
+            graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
+            rl.question('⏰ Continue in next step? [Y] OR, Update Manually? [N]: ', async (auto) => {
+                if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
+                    resolve(true)
+                } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
+                    rl.question(`⌛ Please manually edit record keys in \'records.json\' file, save them and then press ENTER: `, async (done) => {
+                        resolve(false)
+                    })
+                } else {
+                    graphics.print('⛔ Bad Input', "orange")
+                    resolve(await writeRecords()) // Recursive call
+                }
+            })
+        })
+    }
+}
+let written = await writeRecords()
+
+// Writes ENS Records: addr60
+async function write_addr60(_addr60_) {
+    if (welcome && written) {
+        return new Promise(async (resolve) => {
+            rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
+                if (_addr60) {
+                    if (helper.isAddr(_addr60)) {  // strip '0x'
+                        _addr60_[0].value = _addr60
+                        resolve([true, _addr60_])
+                    } else {
+                        graphics.print('⛔ Bad Input', "orange")
+                        resolve(await write_addr60()) // Recursive call
+                    }
+                } else {
+                    _addr60_[0].value = null
+                    resolve([true, _addr60_])
+                }
+            })
+        })
+    } else {
+        return new Promise(async (resolve) => {
+            resolve([false, _addr60_])
+        })
+    }
+}
+let [written_addr60, _addr60] = await write_addr60(addr60)
+addr60 = _addr60
+// Writes ENS Records: avatar
+async function write_avatar(_avatar_) {
+    if (welcome && written && written_addr60) {
+        return new Promise(async (resolve) => {
+            rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
+                if (_avatar) {
+                    if (helper.isAvatar(_avatar)) {
+                        _avatar_[0].value = _avatar
+                        resolve([true, _avatar_])
+                    } else {
+                        graphics.print('⛔ Bad Input', "orange")
+                        resolve(await write_avatar()) // Recursive call
+                    }
+                } else {
+                    _avatar_[0].value = null
+                    resolve([true, _avatar_])
+                }
+            })
+        })
+    } else {
+        return new Promise(async (resolve) => {
+            resolve([false, _avatar_])
+        })
+    }
+}
+let [written_avatar, _avatar] = await write_avatar(avatar)
+avatar = _avatar
+// Writes ENS Records: contenthash
+async function write_contenthash(_contenthash_) {
+    if (welcome && written && written_addr60 && written_avatar) {
+        return new Promise(async (resolve) => {
+            rl.question('📝 Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
+                if (_contenthash) {
+                    if (helper.isContenthash(_contenthash)) {
+                        _contenthash_[0].value = _contenthash
+                        resolve([true, _contenthash_])
+                    } else {
+                        graphics.print('⛔ Bad Input! Resetting...', "orange")
+                        resolve(await writeRecords()) // Recursive call
+                    }
+                } else {
+                    _contenthash_[0].value = null
+                    resolve([true, _contenthash_])
+                }
+            })
+        })
+    } else {
+        return new Promise(async (resolve) => {
+            resolve([false, _contenthash_])
+        })
+    }
+}
+let [written_contenthash, _contenthash] = await write_contenthash(contenthash)
+contenthash = _contenthash
+
 // Confirms ENS Records
 async function confirmRecords(detectedUser) {
     if (welcome) {
