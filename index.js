@@ -20,7 +20,7 @@ if (args[0] === "init") {
 }
 
 // Determine which function to run based on the command-line argument
-if (args.length > 0) {
+if (args.length > 1) {
     switch (args[1]) {
         case 'init':
             init()
@@ -31,6 +31,4 @@ if (args.length > 0) {
         default:
             console.log('Invalid function name (available functions: init, sign)')
     }
-} else {
-    console.log('Please provide a function name (available functions: init, sign)')
 }

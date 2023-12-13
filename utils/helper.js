@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync, statSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync, statSync, readdirSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
 import axios from 'axios'
@@ -332,6 +332,17 @@ async function writeConfig(signerKey) {
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
     writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
+    const files = readdirSync('./')
+    for (const file of files) {
+      const filePath = path.join('./', file)
+      if (statSync(filePath).isFile()) {
+        const ext = path.extname(filePath)
+        // Check if the file has a webpage extension
+        if (['.html', '.htm', '.htmx'].includes(ext.toLowerCase())) {
+          execSync('touch index.html')
+        }
+      }
+    }
     return true
   }
 }

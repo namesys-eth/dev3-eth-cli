@@ -386,9 +386,12 @@ export async function publish() {
                 writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
                 writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
                 let _container = `.well-known/eth/dev3/${detectedUser}`
-                execSync(`rm -r ${_container}`)
+                // Clean .well-known
+                if (existsSync(_container)) execSync(`rm -r ${_container}`)
+                // Make .well-known
                 execSync(`mkdir -p ${_container}`)
-                execSync(`cp -r records/* ${_container}`)
+                // Copy Records to .well-known
+                if (existsSync('records')) execSync(`cp -r records/* ${_container}`)
                 resolve(true)
             })
         } else {
