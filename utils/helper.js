@@ -325,7 +325,6 @@ async function writeConfig(signerKey) {
   if (!existsSync('.gitignore')) {
     // If not, create .gitignore file and add specified content
     writeFileSync('.gitignore', gitignoreContent)
-    return true
   } else {
     // If .gitignore exists, check if it contains '.env' line
     const gitignoreContents = readFileSync('.gitignore', 'utf-8')
@@ -333,13 +332,13 @@ async function writeConfig(signerKey) {
       // If '.env' line is not present, add it to .gitignore
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
-    writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
-    // Prevents 404 on Github homepage
-    if (!existsSync('README.md')) writeFileSync('README.md', '#')
-    // Prevents GitHub pages from ignoring hidden files
-    if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
-    return true
   }
+  writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
+  // Prevents 404 on Github homepage
+  if (!existsSync('README.md')) writeFileSync('README.md', '#')
+  // Prevents GitHub pages from ignoring hidden files
+  if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
+  return true
 }
 
 // Signs an ENS Record

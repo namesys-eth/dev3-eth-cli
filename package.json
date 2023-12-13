@@ -1,6 +1,6 @@
 {
     "name": "dev3-eth",
-    "version": "0.0.8-alpha",
+    "version": "0.0.9-alpha",
     "description": "ENS-on-GitHub by NameSys",
     "main": "index.js",
     "scripts": {
