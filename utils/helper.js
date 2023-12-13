@@ -99,10 +99,10 @@ async function getGitRepo() {
         repoName
       ]
     } else {
-      return null
+      return [null, null, null, null]
     }
   } catch (error) {
-    return null
+    return [null, null, null, null]
   }
 }
 
@@ -336,6 +336,11 @@ async function writeConfig(signerKey) {
   writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
   // Prevents 404 on Github homepage
   if (!existsSync('README.md')) writeFileSync('README.md', '#')
+  if (
+    !existsSync('index.html') &&
+    !existsSync('index.htmx') &&
+    !existsSync('index.htm')
+  ) writeFileSync('index.html', constants.htmlContent)
   // Prevents GitHub pages from ignoring hidden files
   if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
   return true
