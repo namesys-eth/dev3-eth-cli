@@ -4,9 +4,28 @@
     "description": "ENS-on-GitHub by NameSys",
     "main": "index.js",
     "scripts": {
-        "start": "node index.js"
+        "start": "node index.js",
+        "init": "node index.js init",
+        "sign": "node index.js sign"
     },
-    "keywords": [],
+    "publishConfig": {
+        "access": "public"
+    },
+    "homepage": "https://github.com/namesys-eth/dev3-eth-cli#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/namesys-eth/dev3-eth-cli"
+    },
+    "bugs": {
+        "url": "https://github.com/namesys-eth/dev3-eth-cli/issues"
+    },
+    "keywords": [
+        "ens",
+        "ccip",
+        "dev3",
+        "namesys",
+        "dev3-eth"
+    ],
     "files": [
         ".gitignore",
         ".nojekyll",
@@ -19,9 +38,10 @@
         "utils"
     ],
     "bin": {
-        "dev3": "index.js"
+        "dev3-eth": "index.js"
     },
-    "author": "NameSys",
+    "author": "@namesys-eth",
+    "contributors": [ "sshmatrix", "@namesys-eth"],
     "license": "MIT",
     "type": "module",
     "dependencies": {

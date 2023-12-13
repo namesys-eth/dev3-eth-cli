@@ -5,19 +5,19 @@
 ### `NPM`
 
 ```bash
-npm install -g @namesys-eth/dev3-eth-cli
+npm install -g @namesys-eth/dev3-eth
 ```
 
 ### `CURL`
 
 ```bash
-VERSION=0.0.2-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
+VERSION=0.0.3-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
 ```
 
 ### `WGET`
 
 ```bash
-VERSION=0.0.2-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
+VERSION=0.0.3-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* . && rm -r package $FILE
 ```
 
 ## Install Package
