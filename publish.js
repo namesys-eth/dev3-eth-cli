@@ -56,9 +56,7 @@ async function writeRecords() {
                 if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
                     resolve(true)
                 } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
-                    rl.question(`⌛ Please manually edit record keys in \'records.json\' file, save them and then press ENTER: `, async (done) => {
-                        resolve(false)
-                    })
+                    resolve(false)
                 } else {
                     graphics.print('⛔ Bad Input', "orange")
                     resolve(await writeRecords()) // Recursive call
