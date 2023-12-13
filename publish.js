@@ -1,10 +1,8 @@
-import { ethers, SigningKey } from 'ethers'
 import readline from 'readline'
-import keygen from './utils/keygen.js'
 import constants from './utils/constants.js'
 import graphics from './utils/graphics.js'
 import helper from './utils/helper.js'
-import fs, { writeFileSync, readFileSync, existsSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync } from 'fs'
 import { createRequire } from 'module'
 import { execSync } from 'child_process'
 const require = createRequire(import.meta.url)
@@ -101,7 +99,7 @@ export async function publish() {
             return new Promise(async (resolve) => {
                 rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
                     if (_avatar) {
-                        if (helper.isAvatar(_avatar)) {
+                        if (helper.isURL(_avatar)) {
                             _avatar_[0].value = _avatar
                             resolve([true, _avatar_])
                         } else {
@@ -302,7 +300,7 @@ export async function publish() {
         ).records.address.eth,
         'addr/60',
         'addr',
-        constants.zeroAddress
+        constants.resolver
     )
     // Sign avatar
     const [payload_avatar, signature_avatar] = await signRecords(
@@ -312,7 +310,7 @@ export async function publish() {
         ).records.text.avatar,
         'text/avatar',
         'avatar',
-        constants.zeroAddress
+        constants.resolver
     )
     // Sign contenthash
     const [payload_contenthash, signature_contenthash] = await signRecords(
@@ -322,7 +320,7 @@ export async function publish() {
         ).records.contenthash,
         'contenthash',
         'contenthash',
-        constants.zeroAddress
+        constants.resolver
     )
 
     // Gets status of CF approval

@@ -42,6 +42,7 @@ const record = {
 const validator = 'https://dev3.namesys.xyz/verify/'
 const verify = 'verify.json'
 const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
+const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
 
 export default {
   githubIDRegex,
@@ -57,5 +58,6 @@ export default {
   validator,
   verify,
   zeroAddress,
-  signedRecord
+  signedRecord,
+  resolver
 }
