@@ -29,7 +29,7 @@ export async function publish() {
         graphics.print(`❌ Quitting...`, "orange")
         rl.close()
     }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser) : await helper.validateGithubID(rl)) : false
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, 'verify.json') : await helper.validateGithubID(rl, 'verify.json')) : false
 
     // Define Records
     let addr60 = [

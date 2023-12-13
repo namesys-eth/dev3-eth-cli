@@ -25,7 +25,7 @@ export async function init() {
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
     }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser) : await helper.validateGithubID(rl)) : false
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, '') : await helper.validateGithubID(rl, '')) : false
 
     // Gets Signer Keypair
     async function getSigner() {
