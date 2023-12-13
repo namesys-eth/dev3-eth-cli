@@ -2,12 +2,12 @@
   "signer": "0x78B1e75E93546d38D7fE4414048429Dbe63872e4",
   "approval": "0xbedab8984b33e8915c05db4848d1e50f87c602e5d42724115737ac24e63ce32a5fc44e2b65c737bef71a18239ea05a89bbb858b1abb453705a051e67b7a49b9c1c",
   "records": {
-    "contenthash": null,
+    "contenthash": "ipfs://QmRAQB6YaCyidP37UdDnjFY5vQuiBrcqdyoW1CuDgwxkD4",
     "address": {
-      "eth": "0xdAC17F958D2ee523a2206206994597C13D831000"
+      "eth": "0x988337249bdaf2f01ceF1120E9B312Bcf6Ac62F5"
     },
     "text": {
-      "avatar": null
+      "avatar": "https://example.com/logo.png"
     }
   },
   "githubid": "namesys-eth"
