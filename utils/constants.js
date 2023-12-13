@@ -39,9 +39,25 @@ const record = {
   approval: null
 }
 
+// Create a minimal HTML file content
+const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>
+</head>
+<body>
+  <h1></h1>
+</body>
+</html>
+`
+
 const validator = 'https://dev3.namesys.xyz/verify/'
 const verify = 'verify.json'
 const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
+const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
 
 export default {
   githubIDRegex,
@@ -57,5 +73,7 @@ export default {
   validator,
   verify,
   zeroAddress,
-  signedRecord
+  signedRecord,
+  resolver,
+  htmlContent
 }

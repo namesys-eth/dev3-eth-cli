@@ -99,10 +99,10 @@ async function getGitRepo() {
         repoName
       ]
     } else {
-      return null
+      return [null, null, null, null]
     }
   } catch (error) {
-    return null
+    return [null, null, null, null]
   }
 }
 
@@ -178,61 +178,77 @@ function requestGithubID(detectedUser, rl) {
 }
 
 // Validates Github ID for login
-function validateGithubID(rl) {
+function validateGithubID(rl, suffix) {
   return new Promise((resolve) => {
     rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
       if (isValidGithubID(githubID)) {
         const _githubIDExists = await githubIDExists(githubID)
         if (_githubIDExists) {
           graphics.print(`👋 Welcome, ${githubID}!`, "yellow")
-          const _ghpages = await isGithubPagesConfigured(githubID)
+          const _ghpages = await isGithubPagesConfigured(githubID, suffix)
           if (_ghpages) {
             graphics.print(`✅ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
             graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
             graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve(true) // Resolve the promise with true
           } else {
-            graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/`, "orange")
-            graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-            graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
-            graphics.print(`❌ Quitting...`, "orange")
-            resolve(false) // Resolve the promise with false
+            if (!suffix) {
+              graphics.print(`🚧 Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "yellow")
+              graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+              graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
+              graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
+              resolve(true) // Resolve the promise with true
+            } else {
+              graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "orange")
+              graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+              graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
+              graphics.print(`❌ Quitting...`, "orange")
+              resolve(false) // Resolve the promise with false
+            }
           }
         } else {
           graphics.print('❌ Github ID Not Found! Please try again OR press CTRL + C to exit', "orange")
-          resolve(await validateGithubID()) // Recursive call to prompt for GithubID again
+          resolve(await validateGithubID(rl, suffix)) // Recursive call to prompt for GithubID again
         }
       } else {
         graphics.print('❌ Invalid Github ID! Please try again OR press CTRL + C to exit', "orange")
-        resolve(await validateGithubID()) // Recursive call to prompt for GithubID again
+        resolve(await validateGithubID(rl, suffix)) // Recursive call to prompt for GithubID again
       }
     })
   })
 }
 
 // Skip Github ID for login
-function skipGithubID(detectedUser) {
+function skipGithubID(detectedUser, suffix) {
   return new Promise(async (resolve) => {
     graphics.print(`🧪 Continuing with Github ID: ${detectedUser}`, "skyblue")
     graphics.print(`👋 Welcome, ${detectedUser}!`, "yellow")
-    const _ghpages = await isGithubPagesConfigured(detectedUser)
+    const _ghpages = await isGithubPagesConfigured(detectedUser, suffix)
     if (_ghpages) {
       graphics.print(`✅ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
       graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
       graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
       resolve(true)
     } else {
-      graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/`, "orange")
-      graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-      graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
-      graphics.print(`❌ Quitting...`, "orange")
-      resolve(false)
+      if (!suffix) {
+        graphics.print(`🚧 Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "yellow")
+        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+        graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
+        graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
+        resolve(true) // Resolve the promise with true
+      } else {
+        graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "orange")
+        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+        graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
+        graphics.print(`❌ Quitting...`, "orange")
+        resolve(false) // Resolve the promise with false
+      }
     }
   })
 }
 
 // Sends Git Commit & Push to Remote
-async function gitSend(branch, timestamp, githubKey, files) {
+async function sendToRemote(branch, timestamp, githubKey, files) {
   try {
     if (githubKey) {
       execSync(`git add ${files}; git commit -S -m "dev3: ${timestamp}"; git push -u origin ${branch}`)
@@ -260,7 +276,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
       }
       rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
         if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
-          const _pushed = await gitSend(branch, timestamp, githubKey, files)
+          const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
           resolve(_pushed)
           graphics.print(message, "lightgreen")
           graphics.print(`👋 BYEE!`, "lightgreen")
@@ -299,9 +315,9 @@ async function isRemoteSynced(branch) {
 }
 
 // Checks if GitHub Pages is configured
-async function isGithubPagesConfigured(username) {
+async function isGithubPagesConfigured(username, suffix) {
   try {
-    const response = await axios.get(`https://${username}.github.io/`)
+    const response = await axios.get(`https://${username}.github.io/${suffix}`)
     return response.status === 200 && response.status !== 404
   } catch (error) {
     return false
@@ -323,7 +339,6 @@ async function writeConfig(signerKey) {
   if (!existsSync('.gitignore')) {
     // If not, create .gitignore file and add specified content
     writeFileSync('.gitignore', gitignoreContent)
-    return true
   } else {
     // If .gitignore exists, check if it contains '.env' line
     const gitignoreContents = readFileSync('.gitignore', 'utf-8')
@@ -331,20 +346,22 @@ async function writeConfig(signerKey) {
       // If '.env' line is not present, add it to .gitignore
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
-    writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
-    const files = readdirSync('./')
-    for (const file of files) {
-      const filePath = path.join('./', file)
-      if (statSync(filePath).isFile()) {
-        const ext = path.extname(filePath)
-        // Check if the file has a webpage extension
-        if (['.html', '.htm', '.htmx'].includes(ext.toLowerCase())) {
-          execSync('touch index.html')
-        }
-      }
-    }
-    return true
   }
+  writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
+  // Prevents 404 on Github homepage
+  if (
+    !existsSync('README.md') &&
+    !existsSync('.nojekyll')
+  ) writeFileSync('README.md', '#')
+  if (
+    !existsSync('index.html') &&
+    !existsSync('index.htmx') &&
+    !existsSync('index.htm') &&
+    existsSync('.nojekyll')
+  ) writeFileSync('index.html', constants.htmlContent)
+  // Prevents GitHub pages from ignoring hidden files
+  if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
+  return true
 }
 
 // Signs an ENS Record

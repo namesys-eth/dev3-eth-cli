@@ -1,10 +1,8 @@
-import { ethers, SigningKey } from 'ethers'
 import readline from 'readline'
-import keygen from './utils/keygen.js'
 import constants from './utils/constants.js'
 import graphics from './utils/graphics.js'
 import helper from './utils/helper.js'
-import fs, { writeFileSync, readFileSync, existsSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync } from 'fs'
 import { createRequire } from 'module'
 import { execSync } from 'child_process'
 const require = createRequire(import.meta.url)
@@ -31,7 +29,7 @@ export async function publish() {
         graphics.print(`❌ Quitting...`, "orange")
         rl.close()
     }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser) : await helper.validateGithubID(rl)) : false
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, 'verify.json') : await helper.validateGithubID(rl, 'verify.json')) : false
 
     // Define Records
     let addr60 = [
@@ -200,7 +198,7 @@ export async function publish() {
         ).records.address.eth,
         'addr/60',
         'addr',
-        constants.zeroAddress
+        constants.resolver
     )
     // Sign avatar
     const [payload_avatar, signature_avatar] = await signRecords(
@@ -210,7 +208,7 @@ export async function publish() {
         ).records.text.avatar,
         'text/avatar',
         'avatar',
-        constants.zeroAddress
+        constants.resolver
     )
     // Sign contenthash
     const [payload_contenthash, signature_contenthash] = await signRecords(
@@ -220,7 +218,7 @@ export async function publish() {
         ).records.contenthash,
         'contenthash',
         'contenthash',
-        constants.zeroAddress
+        constants.resolver
     )
 
     // Gets status of CF approval
@@ -239,40 +237,40 @@ export async function publish() {
                     resolve(false)
                 }
                 const verifier = await response.json()
-                if (verifier.gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
+                if (verifier.Gateway === `${detectedUser}.github.io` && verifier.ApprovedFor === _verify.signer) {
                     _verify.verified = true
-                    _verify.accessKey = verifier.approval
-                    _buffer.approval = verifier.approval
+                    _verify.accessKey = verifier.ApprovalSig
+                    _buffer.approval = verifier.ApprovalSig
                     graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
                     graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
                     // addr60
                     if (_buffer.records.address.eth) {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
-                        _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.approval)
+                        _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.ApprovalSig)
                         _addr60.signer = _verify.signer
                         _addr60.signature = signature_addr60
                         _addr60.approved = true
-                        _addr60.approval = verifier.approval
+                        _addr60.approval = verifier.ApprovalSig
                         writeFileSync(constants.records.addr60, JSON.stringify(_addr60, null, 2))
                     }
                     // avatar
                     if (_buffer.records.text.avatar) {
                         let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.approval)
+                        _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.ApprovalSig)
                         _avatar.signer = _verify.signer
                         _avatar.signature = signature_avatar
                         _avatar.approved = true
-                        _avatar.approval = verifier.approval
+                        _avatar.approval = verifier.ApprovalSig
                         writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
                     }
                     // contenthash
                     if (_buffer.records.contenthash) {
                         let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approval)
+                        _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.ApprovalSig)
                         _contenthash.signer = _verify.signer
                         _contenthash.signature = signature_contenthash
                         _contenthash.approved = true
-                        _contenthash.approval = verifier.approval
+                        _contenthash.approval = verifier.ApprovalSig
                         writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
                     }
                 } else {
@@ -285,11 +283,15 @@ export async function publish() {
                 writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
                 let _container = `.well-known/eth/dev3/${detectedUser}`
                 // Clean .well-known
-                if (existsSync(_container)) execSync(`rm -r ${_container}`)
+                if (existsSync(_container)) {
+                    execSync(`rm -r ${_container}`)
+                }
                 // Make .well-known
                 execSync(`mkdir -p ${_container}`)
                 // Copy Records to .well-known
-                if (existsSync('records')) execSync(`cp -r records/* ${_container}`)
+                if (existsSync('records')) {
+                    execSync(`cp -r records/* ${_container}`)
+                }
                 resolve(true)
             })
         } else {
@@ -298,10 +300,10 @@ export async function publish() {
                 resolve(false)
             })
         }
-    }
+    } 
     const validated = await getStatus(detectedUser)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll',
+        'verify.json .gitignore .nojekyll README.md index.htm*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`
     )
 }

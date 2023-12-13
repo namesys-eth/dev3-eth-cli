@@ -25,7 +25,7 @@ export async function init() {
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
     }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser) : await helper.validateGithubID(rl)) : false
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, '') : await helper.validateGithubID(rl, '')) : false
 
     // Gets Signer Keypair
     async function getSigner() {
@@ -64,7 +64,7 @@ export async function init() {
     }
     const configured = await setKeypair(keypair)
     await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll',
+        'verify.json .gitignore .nojekyll README.md index.htm*',
         `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run publish\'`
     )
 }
