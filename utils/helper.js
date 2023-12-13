@@ -4,9 +4,11 @@ import path from 'path'
 import axios from 'axios'
 import constants from './constants.js'
 import graphics from './graphics.js'
+import * as ensContent from './contenthash.js'
 import { execSync } from 'child_process'
 import { ethers, SigningKey, Wallet } from 'ethers'
 import { createRequire } from 'module'
+import { formatsByName } from '@ensdomains/address-encoder'
 const require = createRequire(import.meta.url)
 require('dotenv').config()
 
@@ -334,6 +336,76 @@ async function signRecord(gateway, chainID, resolver, recordType, extradata, sig
   return [_toSign, signature]
 }
 
+/// Encode string values of records
+// returns abi.encodeWithSelector(iCallbackType.signedRecord.selector, _signer, _recordSignature, _approvedSignature, result)
+function encodeValue(key, value, _signer, _recordSignature, _approvedSignature) {
+  let encoded
+  let _value = ''
+  let type = ''
+  if (['avatar', 'email', 'pubkey', 'github', 'url', 'twitter', 'x', 'discord', 'farcaster', 'nostr', 'zonehash'].includes(key)) {
+    type = 'string'
+    _value = value
+  }
+  if (['btc', 'ltc', 'doge', 'sol', 'atom'].includes(key)) {
+    type = 'bytes'
+    _value = `0x${formatsByName[key.toUpperCase()].decoder(value).toString('hex')}`
+  }
+  if (key === 'contenthash') {
+    type = 'bytes'
+    _value = ensContent.encodeContenthash(value).encoded
+  }
+  if (key === 'addr') {
+    type = 'address'
+    _value = value
+  }
+  let _result = ethers.AbiCoder.defaultAbiCoder().encode([type], [_value])
+  let _ABI = [constants.signedRecord]
+  let _interface = new ethers.Interface(_ABI)
+  let _encodedWithSelector = _interface.encodeFunctionData(
+    "signedRecord",
+    [
+      _signer,
+      _recordSignature,
+      _approvedSignature,
+      _result
+    ]
+  )
+  encoded = _encodedWithSelector
+  return encoded
+}
+
+// Generate extradata
+function genExtradata(key, _recordValue) {
+  // returns bytesToHexString(abi.encodePacked(keccak256(result)))
+  let type = ''
+  let _value = ''
+  if (['avatar', 'email', 'pubkey',
+    'github', 'url', 'twitter', 'x', 'discord', 'farcaster', 'nostr',
+    'zonehash'
+  ].includes(key)) {
+    type = 'string'
+    _value = _recordValue
+  }
+  if ([
+    'btc', 'ltc', 'doge', 'sol', 'atom'
+  ].includes(key)) {
+    type = 'bytes'
+    _value = `0x${formatsByName[key.toUpperCase()].decoder(_recordValue).toString('hex')}`
+  }
+  if (key === 'contenthash') {
+    type = 'bytes'
+    _value = ensContent.encodeContenthash(_recordValue).encoded
+  }
+  if (key === 'addr') {
+    type = 'address'
+    _value = _recordValue
+  }
+  let _result = ethers.AbiCoder.defaultAbiCoder().encode([type], [_value])
+  const toPack = ethers.keccak256(_result)
+  const _extradata = ethers.hexlify(ethers.solidityPacked(["bytes"], [toPack]))
+  return _extradata
+}
+
 export default {
   createDeepFile,
   githubIDExists,
@@ -352,5 +424,7 @@ export default {
   gitCommitPush,
   isAddr,
   isURL,
-  isContenthash
+  isContenthash,
+  encodeValue,
+  genExtradata
 }

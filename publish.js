@@ -153,48 +153,9 @@ contenthash = _contenthash
 
 // Confirms ENS Records
 async function confirmRecords(detectedUser) {
-    if (welcome && written && written_addr60 && written_avatar && written_contenthash) {
+    if (welcome) {
         return new Promise(async (resolve) => {
-            rl.question('⏰ Confirm Records Update? [Y/N]: ', async (_write) => {
-                if (_write.toLowerCase() === 'y' || _write.toLowerCase() === 'yes') {
-                    graphics.print(`🧪 Processing...`, "skyblue")
-                    let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
-                    // addr60
-                    if (addr60[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.addr60)
-                        if (_file) writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
-                        _buffer.records.address.eth = addr60[0].value
-                    }
-                    // avatar
-                    if (avatar[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.avatar)
-                        if (_file) writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
-                        _buffer.records.text.avatar = avatar[0].value
-                    }
-                    // contenthash
-                    if (contenthash[0].value) {
-                        const _file = await helper.createDeepFile(constants.records.contenthash)
-                        if (_file) writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
-                        _buffer.records.contenthash = contenthash[0].value
-                    }
-                    // githubid
-                    _buffer.githubid = detectedUser
-                    // signer
-                    _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
-                    writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
-                    resolve(true)
-                } else if (_write.toLowerCase() === 'n' || _write.toLowerCase() === 'no') {
-                    graphics.print(`❌ Quitting...`, "orange")
-                    resolve(false) // Recursive call
-                } else {
-                    graphics.print('⛔ Bad Input', "orange")
-                    resolve(await confirmRecords()) // Recursive call
-                }
-            })
-        })
-    } else {
-        if (welcome) {
-            return new Promise(async (resolve) => {
+            rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
                 let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
                 _buffer.githubid = detectedUser
                 _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
@@ -232,7 +193,7 @@ async function confirmRecords(detectedUser) {
                 }
                 resolve(true)
             })
-        }
+        })
     }
 }
 let confirmed = await confirmRecords(detectedUser)
@@ -304,7 +265,7 @@ async function verifyRecords() {
 const verified = await verifyRecords()
 
 // Signs ENS Records
-async function signRecords(detectedUser, record, type) {
+async function signRecords(detectedUser, record, type, key, resolver) {
     if (welcome && record) {
         if (verified) {
             return new Promise(async (resolve) => {
@@ -312,9 +273,9 @@ async function signRecords(detectedUser, record, type) {
                 const _signed = helper.signRecord(
                     `https://${detectedUser}.github.io`,
                     '1',
-                    '0x4675C7e5BaAFBFFbca748158bEcBA61ef0000000',
+                    resolver,
                     type,
-                    record,
+                    helper.genExtradata(key, record),
                     JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
                 )
                 resolve(_signed)
@@ -340,7 +301,9 @@ const [payload_addr60, signature_addr60] = await signRecords(
     JSON.parse(
         readFileSync(constants.records.all, 'utf-8')
     ).records.address.eth,
-    'addr/60'
+    'addr/60',
+    'addr',
+    constants.zeroAddress
 )
 // Sign avatar
 const [payload_avatar, signature_avatar] = await signRecords(
@@ -348,7 +311,9 @@ const [payload_avatar, signature_avatar] = await signRecords(
     JSON.parse(
         readFileSync(constants.records.all, 'utf-8')
     ).records.text.avatar,
-    'text/avatar'
+    'text/avatar',
+    'avatar',
+    constants.zeroAddress
 )
 // Sign contenthash
 const [payload_contenthash, signature_contenthash] = await signRecords(
@@ -356,7 +321,9 @@ const [payload_contenthash, signature_contenthash] = await signRecords(
     JSON.parse(
         readFileSync(constants.records.all, 'utf-8')
     ).records.contenthash,
-    'contenthash'
+    'contenthash',
+    'contenthash',
+    constants.zeroAddress
 )
 
 // Gets status of CF approval
@@ -365,59 +332,57 @@ async function getStatus(detectedUser) {
         return new Promise(async (resolve) => {
             let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
             let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
-            if (!_verify.verified) {
-                graphics.print(`🧪 Waiting for validation from Cloudflare...`, "skyblue")
-                const _url = `${constants.validator}${detectedUser}`
-                const response = await fetch(_url)
-                if (!response.ok) {
-                    graphics.print(`❗ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
-                    graphics.print(`❌ Quitting...`, "orange")
-                    rl.close()
-                    resolve(false)
+            graphics.print(`🧪 Waiting for validation from Cloudflare...`, "skyblue")
+            const _url = `${constants.validator}${detectedUser}`
+            const response = await fetch(_url)
+            if (!response.ok) {
+                graphics.print(`❗ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
+                graphics.print(`❌ Quitting...`, "orange")
+                rl.close()
+                resolve(false)
+            }
+            const verifier = await response.json()
+            if (verifier.gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
+                _verify.verified = true
+                _verify.accessKey = verifier.approval
+                _buffer.approval = verifier.approval
+                graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
+                graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
+                // addr60
+                if (_buffer.records.address.eth) {
+                    let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
+                    _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.approval)
+                    _addr60.signer = _verify.signer
+                    _addr60.signature = signature_addr60
+                    _addr60.approved = true
+                    _addr60.approval = verifier.approval
+                    writeFileSync(constants.records.addr60, JSON.stringify(_addr60, null, 2))
                 }
-                const verifier = await response.json()
-                if (verifier.gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
-                    _verify.verified = true
-                    _verify.accessKey = verifier.approval
-                    _buffer.approval = verifier.approval
-                    graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
-                    graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
-                    // addr60
-                    if (_buffer.records.address.eth) {
-                        let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
-                        _addr60.signer = _verify.signer
-                        _addr60.signature = signature_addr60
-                        _addr60.approved = true
-                        _addr60.approval = verifier.approval
-                        writeFileSync(constants.records.addr60, JSON.stringify(_addr60, null, 2))
-                    }
-                    // avatar
-                    if (_buffer.records.text.avatar) {
-                        let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _avatar.signer = _verify.signer
-                        _avatar.signature = signature_avatar
-                        _avatar.approved = true
-                        _avatar.approval = verifier.approval
-                        writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
-                    }
-                    // contenthash
-                    if (_buffer.records.contenthash) {
-                        let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _contenthash.signer = _verify.signer
-                        _contenthash.signature = signature_contenthash
-                        _contenthash.approved = true
-                        _contenthash.approval = verifier.approval
-                        writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
-                    }
-                } else {
-                    graphics.print(`❗ Cloudflare validation failed: Signer DOES NOT match!`, "orange")
-                    graphics.print(`❌ Quitting...`, "orange")
-                    rl.close()
-                    resolve(false)
+                // avatar
+                if (_buffer.records.text.avatar) {
+                    let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
+                    _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.approval)
+                    _avatar.signer = _verify.signer
+                    _avatar.signature = signature_avatar
+                    _avatar.approved = true
+                    _avatar.approval = verifier.approval
+                    writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
+                }
+                // contenthash
+                if (_buffer.records.contenthash) {
+                    let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
+                    _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approval)
+                    _contenthash.signer = _verify.signer
+                    _contenthash.signature = signature_contenthash
+                    _contenthash.approved = true
+                    _contenthash.approval = verifier.approval
+                    writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
                 }
             } else {
-                graphics.print(`🧪 Records already verified by Cloudflare...`, "skyblue")
-                graphics.print(`🧪 Writing records to \'.well-known/eth/dev3/${detectedUser}\'...`, "skyblue")
+                graphics.print(`❗ Cloudflare validation failed: Signer DOES NOT match!`, "orange")
+                graphics.print(`❌ Quitting...`, "orange")
+                rl.close()
+                resolve(false)
             }
             writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
             writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
@@ -426,6 +391,11 @@ async function getStatus(detectedUser) {
             execSync(`mkdir -p ${_container}`)
             execSync(`cp -r records/* ${_container}`)
             resolve(true)
+        })
+    } else {
+        return new Promise(async (resolve) => {
+            graphics.print(`❌ Quitting...`, "orange")
+            resolve(false)
         })
     }
 }
