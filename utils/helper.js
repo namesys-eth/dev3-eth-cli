@@ -334,7 +334,10 @@ async function writeConfig(signerKey) {
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
     writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
+    // Prevents 404 on Github homepage
     if (!existsSync('README.md')) writeFileSync('README.md', '#')
+    // Prevents GitHub pages from ignoring hidden files
+    if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', ' ')
     return true
   }
 }
