@@ -231,14 +231,14 @@ function skipGithubID(detectedUser, suffix) {
       resolve(true)
     } else {
       if (!suffix) {
-        graphics.print(`🚧 Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "yellow")
-        graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+        graphics.print(`🚧 Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "yellow")
+        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
         graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
         graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
         resolve(true) // Resolve the promise with true
       } else {
-        graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "orange")
-        graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+        graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "orange")
+        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
         graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
         graphics.print(`❌ Quitting...`, "orange")
         resolve(false) // Resolve the promise with false
