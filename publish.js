@@ -385,11 +385,15 @@ export async function publish() {
                 writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
                 let _container = `.well-known/eth/dev3/${detectedUser}`
                 // Clean .well-known
-                if (existsSync(_container)) execSync(`rm -r ${_container}`)
+                if (existsSync(_container)) {
+                    execSync(`rm -r ${_container}`)
+                }
                 // Make .well-known
                 execSync(`mkdir -p ${_container}`)
                 // Copy Records to .well-known
-                if (existsSync('records')) execSync(`cp -r records/* ${_container}`)
+                if (existsSync('records')) {
+                    execSync(`cp -r records/* ${_container}`)
+                }
                 resolve(true)
             })
         } else {
@@ -401,7 +405,7 @@ export async function publish() {
     } 
     const validated = await getStatus(detectedUser)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll',
+        'verify.json .gitignore .nojekyll index.html',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`
     )
 }

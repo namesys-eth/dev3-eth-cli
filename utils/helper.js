@@ -232,7 +232,7 @@ function skipGithubID(detectedUser) {
 }
 
 // Sends Git Commit & Push to Remote
-async function gitSend(branch, timestamp, githubKey, files) {
+async function sendToRemote(branch, timestamp, githubKey, files) {
   try {
     if (githubKey) {
       execSync(`git add ${files}; git commit -S -m "dev3: ${timestamp}"; git push -u origin ${branch}`)
@@ -260,7 +260,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
       }
       rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
         if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
-          const _pushed = await gitSend(branch, timestamp, githubKey, files)
+          const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
           resolve(_pushed)
           graphics.print(message, "lightgreen")
           graphics.print(`👋 BYEE!`, "lightgreen")
@@ -339,7 +339,7 @@ async function writeConfig(signerKey) {
         const ext = path.extname(filePath)
         // Check if the file has a webpage extension
         if (['.html', '.htm', '.htmx'].includes(ext.toLowerCase())) {
-          execSync('touch index.html')
+          writeFileSync('index.html', JSON.stringify(constants.htmlContent, null, 2))
         }
       }
     }

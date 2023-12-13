@@ -64,7 +64,7 @@ export async function init() {
     }
     const configured = await setKeypair(keypair)
     await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll',
+        'verify.json .gitignore .nojekyll index.html',
         `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run publish\'`
     )
 }

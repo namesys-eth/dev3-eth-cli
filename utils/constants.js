@@ -39,6 +39,21 @@ const record = {
   approval: null
 }
 
+// Create a minimal HTML file content
+const htmlContent = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Placeholder HTML</title>
+</head>
+<body>
+  <h1>Hello, World!</h1>
+</body>
+</html>
+`
+
 const validator = 'https://dev3.namesys.xyz/verify/'
 const verify = 'verify.json'
 const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
@@ -59,5 +74,6 @@ export default {
   verify,
   zeroAddress,
   signedRecord,
-  resolver
+  resolver,
+  htmlContent
 }
