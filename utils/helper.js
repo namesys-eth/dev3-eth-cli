@@ -90,11 +90,13 @@ async function getGitRepo() {
     const signingKey = execSync('git config --get user.signingkey').toString().trim()
     // Extract username from GitHub remote URL
     const usernameMatch = remoteUrl.match(/github\.com[:/](\w+[-_]?\w+)/)
+    const repoName = remoteUrl.split('/').pop().replace(/\.git$/, '')
     if (usernameMatch) {
       return [
         usernameMatch[1],
         branch,
-        signingKey
+        signingKey,
+        repoName
       ]
     } else {
       return null
@@ -109,8 +111,15 @@ function validateGitRepo(rl) {
   return new Promise(async (resolve) => {
     const _isGitRepo = isGitRepo()
     if (_isGitRepo) {
-      const [_username, _branch, _githubKey] = await getGitRepo()
-      graphics.print('✅ Valid git repository', "lightgreen")
+      const [_username, _branch, _githubKey, _repoName] = await getGitRepo()
+      if (_repoName.toLowerCase() === `${_username}.github.io`) {
+        graphics.print(`✅ Valid git repository: ${_repoName.toLowerCase()}`, "lightgreen")
+        graphics.print(`👉 Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from default repository \'${_repoName.toLowerCase()}\'`, "yellow")
+      } else {
+        graphics.print(`🚧 Detected custom git repository: ${_repoName.toLowerCase()} (default: ${_username}.github.io)`, "yellow")
+        graphics.print(`👉 Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from custom repository \'${_repoName.toLowerCase()}\'. Otherwise, please deploy it manually from \'${_repoName.toLowerCase()}\' OR switch to default repository \'${_username}.github.io\'`, "yellow")
+        graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
+      }
       const _synced = !await isRemoteSynced(_branch)
       if (_synced) {
         graphics.print('✅ Remote tip is in sync', "lightgreen")
@@ -137,9 +146,9 @@ function validateGitRepo(rl) {
       graphics.print(`❌ Not a git repository! Please initialise and configure as git repository first. Quitting...`, "orange")
       graphics.print(`❗ PRE-REQUISITES:`, "orange")
       graphics.print(`👉 Please make sure that git repository is initialised and configured to push to remote branch on Github`, "orange")
-      graphics.print(` ◥ https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "skyblue")
+      graphics.print(` ◥ docs: https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "orange")
       graphics.print(`👉 Please make sure that Github Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-      graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+      graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
       rl.close()
       resolve([
         _isGitRepo,
@@ -179,13 +188,13 @@ function validateGithubID(rl) {
           const _ghpages = await isGithubPagesConfigured(githubID)
           if (_ghpages) {
             graphics.print(`✅ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
-            graphics.print(`👉 Please make sure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
-            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+            graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
+            graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve(true) // Resolve the promise with true
           } else {
             graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/`, "orange")
-            graphics.print(`👉 Please make sure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-            graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+            graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+            graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
             graphics.print(`❌ Quitting...`, "orange")
             resolve(false) // Resolve the promise with false
           }
@@ -209,13 +218,13 @@ function skipGithubID(detectedUser) {
     const _ghpages = await isGithubPagesConfigured(detectedUser)
     if (_ghpages) {
       graphics.print(`✅ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
-      graphics.print(`👉 Please make sure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
-      graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+      graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
+      graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
       resolve(true)
     } else {
       graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/`, "orange")
-      graphics.print(`👉 Please make sure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
-      graphics.print(` ◥ https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
+      graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+      graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
       graphics.print(`❌ Quitting...`, "orange")
       resolve(false)
     }
@@ -336,7 +345,7 @@ async function signRecord(gateway, chainID, resolver, recordType, extradata, sig
   return [_toSign, signature]
 }
 
-/// Encode string values of records
+/// Encodes string values of records
 // returns abi.encodeWithSelector(iCallbackType.signedRecord.selector, _signer, _recordSignature, _approvedSignature, result)
 function encodeValue(key, value, _signer, _recordSignature, _approvedSignature) {
   let encoded
@@ -374,7 +383,7 @@ function encodeValue(key, value, _signer, _recordSignature, _approvedSignature) 
   return encoded
 }
 
-// Generate extradata
+// Generates extradata
 function genExtradata(key, _recordValue) {
   // returns bytesToHexString(abi.encodePacked(keccak256(result)))
   let type = ''
