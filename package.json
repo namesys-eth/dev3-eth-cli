@@ -1,13 +1,24 @@
 {
     "name": "dev3-eth",
-    "version": "0.0.1-alpha",
+    "version": "0.0.2-alpha",
     "description": "ENS-on-GitHub by NameSys",
-    "main": "index.js",
+    "main": "init.js",
     "scripts": {
         "init": "node init.js",
         "publish": "node publish.js"
     },
     "keywords": [],
+    "files": [
+        ".gitignore",
+        ".nojekyll",
+        "package.json",
+        "init.js",
+        "publish.js",
+        "records.example.json",
+        "records.json",
+        "verify.json",
+        "utils"
+    ],
     "author": "NameSys",
     "license": "MIT",
     "type": "module",
