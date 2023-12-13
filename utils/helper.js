@@ -194,6 +194,7 @@ function validateGithubID(rl) {
           } else {
             graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/`, "orange")
             graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+            graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
             graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
             graphics.print(`❌ Quitting...`, "orange")
             resolve(false) // Resolve the promise with false
@@ -224,6 +225,7 @@ function skipGithubID(detectedUser) {
     } else {
       graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/`, "orange")
       graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+      graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
       graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
       graphics.print(`❌ Quitting...`, "orange")
       resolve(false)
@@ -332,17 +334,7 @@ async function writeConfig(signerKey) {
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
     writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
-    const files = readdirSync('./')
-    for (const file of files) {
-      const filePath = path.join('./', file)
-      if (statSync(filePath).isFile()) {
-        const ext = path.extname(filePath)
-        // Check if the file has a webpage extension
-        if (['.html', '.htm', '.htmx'].includes(ext.toLowerCase())) {
-          writeFileSync('index.html', JSON.stringify(constants.htmlContent, null, 2))
-        }
-      }
-    }
+    if (!existsSync('README.md')) writeFileSync('README.md', '#')
     return true
   }
 }
