@@ -41,7 +41,11 @@
         "dev3-eth": "index.js"
     },
     "author": "@namesys-eth",
-    "contributors": [ "sshmatrix", "@namesys-eth"],
+    "contributors": [ 
+        "sshmatrix", 
+        "@namesys-eth",
+        "0xc0de4c0ffee"
+    ],
     "license": "MIT",
     "type": "module",
     "dependencies": {
