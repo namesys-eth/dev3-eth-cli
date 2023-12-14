@@ -392,7 +392,7 @@ function encodeValue(key, value, _signer, _recordSignature, _approvedSignature) 
     type = 'bytes'
     _value = ensContent.encodeContenthash(value).encoded
   }
-  if (key === 'addr') {
+  if (key === 'address') {
     type = 'address'
     _value = value
   }
@@ -434,7 +434,7 @@ function genExtradata(key, _recordValue) {
     type = 'bytes'
     _value = ensContent.encodeContenthash(_recordValue).encoded
   }
-  if (key === 'addr') {
+  if (key === 'address') {
     type = 'address'
     _value = _recordValue
   }

@@ -42,13 +42,13 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 ### `[1]`
 
 ```bash
-VERSION=0.1.4-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.5-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
 ```
 
 ### `[2]`
 
 ```bash
-VERSION=0.1.4-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.5-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
 ```
 
 ---
@@ -88,13 +88,13 @@ npx dev3-eth status
 #### `CURL`
 
 ```bash
-VERSION=0.1.4-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.5-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
 ```
 
 #### `WGET`
 
 ```bash
-VERSION=0.1.4-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.5-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
 ```
 
 ### Initialise `sub.dev3.eth` 

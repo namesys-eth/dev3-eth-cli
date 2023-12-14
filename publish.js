@@ -34,7 +34,7 @@ export async function publish() {
     // Define Records
     let addr60 = [
         { ...constants.recordContent },
-        `.well-known/eth/dev3/${detectedUser}/addr/60.json`
+        `.well-known/eth/dev3/${detectedUser}/address/60.json`
     ]
     let avatar = [
         { ...constants.recordContent },
@@ -70,7 +70,7 @@ export async function publish() {
     async function write_addr60(_addr60_) {
         if (welcome && written) {
             return new Promise(async (resolve) => {
-                rl.question('📝 Please enter your ETH address (addr/60) and then press ENTER: ', async (_addr60) => {
+                rl.question('📝 Please enter your ETH address (address/60) and then press ENTER: ', async (_addr60) => {
                     if (_addr60) {
                         if (helper.isAddr(_addr60)) {  // strip '0x'
                             _addr60_[0].value = _addr60
@@ -298,8 +298,8 @@ export async function publish() {
         JSON.parse(
             readFileSync(constants.record, 'utf-8')
         ).records.address.eth,
-        'addr/60',
-        'addr',
+        'address/60',
+        'address',
         constants.resolver
     )
     // Sign avatar
@@ -348,7 +348,7 @@ export async function publish() {
                     // addr60
                     if (_buffer.records.address.eth) {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
-                        _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.approvalSig)
+                        _addr60.data = helper.encodeValue("address", _addr60.value, _verify.signer, signature_addr60, verifier.approvalSig)
                         _addr60.signer = _verify.signer
                         _addr60.signature = signature_addr60
                         _addr60.approved = true
