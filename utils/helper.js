@@ -1,4 +1,4 @@
-import { writeFileSync, readFileSync, existsSync, statSync, readdirSync } from 'fs'
+import { writeFileSync, readFileSync, existsSync, statSync } from 'fs'
 import fs from 'fs/promises'
 import path from 'path'
 import axios from 'axios'

@@ -18,7 +18,7 @@ export async function publish() {
     console.log()
     graphics.print(graphics.asciiArt, 'orange')
     graphics.logo()
-    graphics.print(graphics.publishAsciiArt, 'orange')
+    graphics.print(graphics.signAsciiArt, 'orange')
     console.log()
 
     const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
