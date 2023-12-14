@@ -349,6 +349,8 @@ async function writeConfig(signerKey) {
   if (!existsSync(constants.record)) writeFileSync(constants.record, JSON.stringify(_recordContent, null, 2))
   // Write verify content
   writeFileSync(constants.verify, JSON.stringify(_verifyContent, null, 2))
+  // Prevents GitHub pages from ignoring hidden files
+  if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
   // Prevents 404 on Github homepage
   if (
     !existsSync('README.md') &&
@@ -359,9 +361,9 @@ async function writeConfig(signerKey) {
     !existsSync('index.htmx') &&
     !existsSync('index.htm') &&
     existsSync('.nojekyll')
-  ) writeFileSync('index.html', constants.htmlContent)
-  // Prevents GitHub pages from ignoring hidden files
-  if (!existsSync('.nojekyll')) writeFileSync('.nojekyll', '#')
+  ) {
+    writeFileSync('index.html', constants.htmlContent)
+  }
   return true
 }
 

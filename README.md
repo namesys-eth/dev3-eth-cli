@@ -35,20 +35,14 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 | Context  | Install | Initialise | Publish | Status  |
 |:--------:|:-------:|:----------:|:-------:|:-------:|
 | `GLOBAL` | `npm i -g dev3-eth`  | `npx dev3-eth init` | `npx dev3-eth sign` | `npx dev3-eth status` |
-| `LOCAL`  | `[1]` or `[2]`       | `npm run init`      | `npm run sign`      | `npm run status`      |
+| `LOCAL`  | `[1]`                | `npm run init`      | `npm run sign`      | `npm run status`      |
 
 > 💡 HINT: If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
 
 ### `[1]`
 
 ```bash
-VERSION=0.1.6-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
-```
-
-### `[2]`
-
-```bash
-VERSION=0.1.6-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.8-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ---
@@ -68,16 +62,16 @@ npm i -g dev3-eth
 npx dev3-eth init
 ```
 
-### Set Records for `sub.dev3.eth`
+### Sign Records for `sub.dev3.eth`
 
 ```bash
 npx dev3-eth sign
 ```
 
-### Check Records for `sub.dev3.eth`
+### View Records for `sub.dev3.eth`
 
 ```bash
-npx dev3-eth status
+npx dev3-eth view
 ```
 
 # OR
@@ -85,16 +79,9 @@ npx dev3-eth status
 # `LOCAL` Installation
 
 ### Install Package
-#### `CURL`
 
 ```bash
-VERSION=0.1.6-alpha && FILE=dev3-eth-$VERSION.tgz && curl -LJO https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
-```
-
-#### `WGET`
-
-```bash
-VERSION=0.1.6-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/namesys-eth/dev3-eth-cli/releases/download/$VERSION/$FILE && tar -xzf $FILE && mv package/* package/.nojekyll package/.gitignore . && rm -r package $FILE && npm i
+VERSION=0.1.8-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ### Initialise `sub.dev3.eth` 
@@ -103,14 +90,14 @@ VERSION=0.1.6-alpha && FILE=dev3-eth-$VERSION.tgz && wget https://github.com/nam
 npm run init
 ```
 
-### Set Records for `sub.dev3.eth`
+### Sign Records for `sub.dev3.eth`
 
 ```bash
 npm run sign
 ```
 
-### Check Records for `sub.dev3.eth`
+### View Records for `sub.dev3.eth`
 
 ```bash
-npm run status
+npm run view
 ```
