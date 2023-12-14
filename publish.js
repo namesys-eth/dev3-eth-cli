@@ -33,15 +33,15 @@ export async function publish() {
 
     // Define Records
     let addr60 = [
-        { ...constants.record },
+        { ...constants.recordContent },
         `.well-known/eth/dev3/${detectedUser}/addr/60.json`
     ]
     let avatar = [
-        { ...constants.record },
+        { ...constants.recordContent },
         `.well-known/eth/dev3/${detectedUser}/text/avatar.json`
     ]
     let contenthash = [
-        { ...constants.record },
+        { ...constants.recordContent },
         `.well-known/eth/dev3/${detectedUser}/contenthash.json`
     ]
     /* Define more ENS Records here */
@@ -153,14 +153,14 @@ export async function publish() {
         if (welcome) {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
-                    let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                    let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
                     _buffer.githubid = detectedUser
                     _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
                     // Read from buffer
                     addr60[0].value = _buffer.records.address.eth
                     avatar[0].value = _buffer.records.text.avatar
                     contenthash[0].value = _buffer.records.contenthash
-                    writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
+                    writeFileSync(constants.record, JSON.stringify(_buffer, null, 2))
                     // addr60
                     if (_buffer.records.address.eth) {
                         const _file = await helper.createDeepFile(constants.records.addr60)
@@ -199,11 +199,11 @@ export async function publish() {
     async function verifyRecords() {
         if (welcome && confirmed) {
             return new Promise(async (resolve) => {
-                let __addr60 = { ...constants.record }
-                let __avatar = { ...constants.record }
-                let __contenthash = { ...constants.record }
-                if (existsSync(constants.records.all)) {
-                    let records = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                let __addr60 = { ...constants.recordContent }
+                let __avatar = { ...constants.recordContent }
+                let __contenthash = { ...constants.recordContent }
+                if (existsSync(constants.record)) {
+                    let records = JSON.parse(readFileSync(constants.record, 'utf-8'))
                     __addr60.value = records.records.address.eth || null
                     __avatar.value = records.records.text.avatar || null
                     __contenthash.value = records.records.contenthash || null
@@ -296,7 +296,7 @@ export async function publish() {
     const [payload_addr60, signature_addr60] = await signRecords(
         detectedUser,
         JSON.parse(
-            readFileSync(constants.records.all, 'utf-8')
+            readFileSync(constants.record, 'utf-8')
         ).records.address.eth,
         'addr/60',
         'addr',
@@ -306,7 +306,7 @@ export async function publish() {
     const [payload_avatar, signature_avatar] = await signRecords(
         detectedUser,
         JSON.parse(
-            readFileSync(constants.records.all, 'utf-8')
+            readFileSync(constants.record, 'utf-8')
         ).records.text.avatar,
         'text/avatar',
         'avatar',
@@ -316,7 +316,7 @@ export async function publish() {
     const [payload_contenthash, signature_contenthash] = await signRecords(
         detectedUser,
         JSON.parse(
-            readFileSync(constants.records.all, 'utf-8')
+            readFileSync(constants.record, 'utf-8')
         ).records.contenthash,
         'contenthash',
         'contenthash',
@@ -328,7 +328,7 @@ export async function publish() {
         if (welcome) {
             return new Promise(async (resolve) => {
                 let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
-                let _buffer = JSON.parse(readFileSync(constants.records.all, 'utf-8'))
+                let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
                 graphics.print(`🧪 Waiting for validation from Cloudflare...`, "skyblue")
                 const _url = `${constants.validator}${detectedUser}`
                 const response = await fetch(_url)
@@ -382,7 +382,7 @@ export async function publish() {
                     resolve(false)
                 }
                 writeFileSync(constants.verify, JSON.stringify(_verify, null, 2))
-                writeFileSync(constants.records.all, JSON.stringify(_buffer, null, 2))
+                writeFileSync(constants.record, JSON.stringify(_buffer, null, 2))
                 let _container = `.well-known/eth/dev3/${detectedUser}`
                 // Clean .well-known
                 if (existsSync(_container)) {
@@ -405,7 +405,7 @@ export async function publish() {
     } 
     const validated = await getStatus(detectedUser)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll README.md index.htm*',
+        'verify.json .gitignore .nojekyll README.md .well-known index.htm* records*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run status\'`
     )
 }

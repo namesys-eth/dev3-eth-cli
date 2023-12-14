@@ -23,14 +23,17 @@ const ltcRegex = /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/
 const dogeRegex = /^D[5-9A-HJ-NP-U][1-9A-HJ-NP-Za-km-z]{24,33}$/
 const solRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
 const atomRegex = /^cosmos1[a-zA-Z0-9]{38}$/
+const validator = 'https://dev3.namesys.xyz/verify/'
+const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
+const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
+const record = 'records.json'
+const verify = 'verify.json'
 const records = {
-  all: 'records.json',
   addr60: 'records/addr/60.json',
   avatar: 'records/text/avatar.json',
   contenthash: 'records/contenthash.json'
 }
-
-const record = {
+const recordContent = {
   data: null,
   value: null,
   signer: null,
@@ -38,7 +41,25 @@ const record = {
   approved: false,
   approval: null
 }
-
+const recordsContent = {
+  githubid: null,
+  signer: null,
+  approval: null,
+  records: {
+    contenthash: null,
+    address: {
+      eth: null
+    },
+    text: {
+      avatar: null
+    }
+  }
+}
+const verifyContent = {
+  signer: null,
+  verified: false,
+  accessKey: null
+}
 // Create a minimal HTML file content
 const htmlContent = `
 <!DOCTYPE html>
@@ -53,11 +74,6 @@ const htmlContent = `
 </body>
 </html>
 `
-
-const validator = 'https://dev3.namesys.xyz/verify/'
-const verify = 'verify.json'
-const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
-const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
 
 export default {
   githubIDRegex,
@@ -75,5 +91,8 @@ export default {
   zeroAddress,
   signedRecord,
   resolver,
-  htmlContent
+  htmlContent,
+  verifyContent,
+  recordContent,
+  recordsContent
 }

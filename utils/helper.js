@@ -19,7 +19,7 @@ async function createDeepFile(filePath) {
   try {
     const directory = path.dirname(filePath)
     await fs.mkdir(directory, { recursive: true })
-    await fs.writeFile(filePath, JSON.stringify(constants.record, null, 2))
+    await fs.writeFile(filePath, JSON.stringify(constants.recordContent, null, 2))
     graphics.print(`🧪 Made record file: ${filePath}`, "skyblue")
     return true
   } catch (error) {
@@ -171,7 +171,7 @@ function requestGithubID(detectedUser, rl) {
         resolve(false)
       } else {
         graphics.print('⛔ Bad Input', "orange")
-        resolve(await requestGithubID(detectedUser)) // Recursive call
+        resolve(await requestGithubID(detectedUser, rl)) // Recursive call
       }
     })
   })
@@ -327,11 +327,9 @@ async function isGithubPagesConfigured(username, suffix) {
 // Writes to .env & verify.json, and .gitignore
 async function writeConfig(signerKey) {
   const envContent = `SIGNER=${signerKey[0]}`
-  const verifyContent = {
-    signer: ethers.computeAddress(`0x${signerKey[0]}`),
-    verified: false,
-    accessKey: null
-  }
+  const _verifyContent = constants.verifyContent
+  _verifyContent.signer = ethers.computeAddress(`0x${signerKey[0]}`)
+  const _recordContent = constants.recordsContent
   const gitignoreContent = 'node_modules\n.env\npackage-lock.json'
   // Write content to .env file
   writeFileSync('.env', envContent)
@@ -347,7 +345,10 @@ async function writeConfig(signerKey) {
       writeFileSync('.gitignore', `${gitignoreContents}\n${envContent}`)
     }
   }
-  writeFileSync('verify.json', JSON.stringify(verifyContent, null, 2))
+  // Write empty files
+  if (!existsSync(constants.record)) writeFileSync(constants.record, JSON.stringify(_recordContent, null, 2))
+  // Write verify content
+  writeFileSync(constants.verify, JSON.stringify(_verifyContent, null, 2))
   // Prevents 404 on Github homepage
   if (
     !existsSync('README.md') &&
