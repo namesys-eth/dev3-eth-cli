@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { init } from "./init.js"
 import { publish } from "./publish.js"
+import { status } from "./status.js"
 import graphics from './utils/graphics.js'
 
 // Check for command-line arguments
@@ -9,6 +10,8 @@ if (args[0] === "init") {
     init()
 } else if (args[0] === "sign") {
     publish()
+} else if (args[0] === "view") {
+    status()
 } else {
     // WELCOME!
     graphics.print(graphics.asciiArt, 'orange')
@@ -16,6 +19,7 @@ if (args[0] === "init") {
     console.log()
     graphics.print("👉 Please run 'npx dev3-eth init' (global install) or 'npm run init' (local install) to initialise", "skyblue")
     graphics.print("👉 Please run 'npx dev3-eth sign' (global install) or 'npm run sign' (local install) to sign & publish your ENS records", "skyblue")
+    graphics.print("👉 Please run 'npx dev3-eth view' (global install) or 'npm run view' (local install) to view your ENS records", "skyblue")
     graphics.print(" ◥ docs: https://dev3.eth.limo", "skyblue")
 }
 
@@ -28,7 +32,10 @@ if (args.length > 1) {
         case 'sign':
             sign()
             break
+        case 'view':
+            status()
+            break
         default:
-            console.log('Invalid function name (available functions: init, sign)')
+            console.log('Invalid function name (available functions: init, sign, view)')
     }
 }

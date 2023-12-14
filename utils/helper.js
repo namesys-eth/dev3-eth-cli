@@ -326,7 +326,7 @@ async function isGithubPagesConfigured(username, suffix) {
 
 // Writes to .env & verify.json, and .gitignore
 async function writeConfig(signerKey) {
-  const envContent = `SIGNER=${signerKey[0]}`
+  const envContent = `SIGNER=${signerKey[0]}\nALCHEMY_KEY=`
   const _verifyContent = constants.verifyContent
   _verifyContent.signer = ethers.computeAddress(`0x${signerKey[0]}`)
   const _recordContent = constants.recordsContent

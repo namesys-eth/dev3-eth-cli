@@ -399,6 +399,7 @@ export async function publish() {
         } else {
             return new Promise(async (resolve) => {
                 graphics.print(`❌ Quitting...`, "orange")
+                rl.close()
                 resolve(false)
             })
         }

@@ -6,7 +6,8 @@
     "scripts": {
         "start": "node index.js",
         "init": "node index.js init",
-        "sign": "node index.js sign"
+        "sign": "node index.js sign",
+        "view": "node index.js view"
     },
     "publishConfig": {
         "access": "public"
@@ -42,8 +43,8 @@
         "dev3-eth": "index.js"
     },
     "author": "@namesys-eth",
-    "contributors": [ 
-        "sshmatrix", 
+    "contributors": [
+        "sshmatrix",
         "@namesys-eth",
         "0xc0de4c0ffee"
     ],
