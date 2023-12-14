@@ -150,7 +150,7 @@ export async function publish() {
 
     // Confirms ENS Records
     async function confirmRecords(detectedUser) {
-        if (welcome) {
+        if (welcome && !written) {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
                     let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
@@ -189,6 +189,17 @@ export async function publish() {
                         }
                     }
                     resolve(true)
+                })
+            })
+        } else if (welcome && written) {
+            return new Promise(async (resolve) => {
+                rl.question(`⏰ Please Confirm Records Update (press ENTER to confirm; CTRL + C to exit): `, async (done) => {
+                    if (!done) {
+                        resolve(true)
+                    } else {
+                        graphics.print('⛔ Bad Input', "orange")
+                        resolve(await confirmRecords(detectedUser)) // Recursive call
+                    }
                 })
             })
         }
@@ -269,7 +280,7 @@ export async function publish() {
                     graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
                     const _signed = helper.signRecord(
                         `https://${detectedUser}.github.io`,
-                        '1',
+                        '5',
                         resolver,
                         type,
                         helper.genExtradata(key, record),
