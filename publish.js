@@ -333,46 +333,46 @@ export async function publish() {
                 const _url = `${constants.validator}${detectedUser}`
                 const response = await fetch(_url)
                 if (!response.ok) {
-                    graphics.print(`❗ Failed to connect to Cloudflare approver: error ${response.status}`, "orange")
+                    graphics.print(`❗ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
                     graphics.print(`❌ Quitting...`, "orange")
                     rl.close()
                     resolve(false)
                 }
                 const verifier = await response.json()
-                if (verifier.Gateway === `${detectedUser}.github.io` && verifier.signer === _verify.signer) {
+                if (verifier.gateway === `${detectedUser}.github.io` && verifier.approvedFor === _verify.signer) {
                     _verify.verified = true
-                    _verify.accessKey = verifier.approval
-                    _buffer.approval = verifier.approval
+                    _verify.accessKey = verifier.approvalSig
+                    _buffer.approval = verifier.approvalSig
                     graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
                     graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
                     // addr60
                     if (_buffer.records.address.eth) {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
-                        _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.approval)
+                        _addr60.data = helper.encodeValue("addr", _addr60.value, _verify.signer, signature_addr60, verifier.approvalSig)
                         _addr60.signer = _verify.signer
                         _addr60.signature = signature_addr60
                         _addr60.approved = true
-                        _addr60.approval = verifier.approval
+                        _addr60.approval = verifier.approvalSig
                         writeFileSync(constants.records.addr60, JSON.stringify(_addr60, null, 2))
                     }
                     // avatar
                     if (_buffer.records.text.avatar) {
                         let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.approval)
+                        _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.approvalSig)
                         _avatar.signer = _verify.signer
                         _avatar.signature = signature_avatar
                         _avatar.approved = true
-                        _avatar.approval = verifier.approval
+                        _avatar.approval = verifier.approvalSig
                         writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
                     }
                     // contenthash
                     if (_buffer.records.contenthash) {
                         let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
-                        _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approval)
+                        _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
                         _contenthash.signer = _verify.signer
                         _contenthash.signature = signature_contenthash
                         _contenthash.approved = true
-                        _contenthash.approval = verifier.approval
+                        _contenthash.approval = verifier.approvalSig
                         writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
                     }
                 } else {
