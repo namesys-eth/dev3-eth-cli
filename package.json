@@ -32,6 +32,7 @@
         "package.json",
         "init.js",
         "publish.js",
+        "status.js",
         "records.example.json",
         "records.json",
         "verify.json",

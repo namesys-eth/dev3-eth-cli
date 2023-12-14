@@ -29,7 +29,7 @@ const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
 const record = 'records.json'
 const verify = 'verify.json'
 const records = {
-  addr60: 'records/addr/60.json',
+  addr60: 'records/address/60.json',
   avatar: 'records/text/avatar.json',
   contenthash: 'records/contenthash.json'
 }

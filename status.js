@@ -26,7 +26,7 @@ export async function status() {
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
     }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser) : await helper.validateGithubID(rl)) : false
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, constants.verify) : await helper.validateGithubID(rl, constants.verify)) : false
 
     // Set Alchemy
     
