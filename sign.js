@@ -429,7 +429,7 @@ export async function sign() {
     )
     const validated = await getStatus(detectedUser, welcome)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll README.md .well-known index.htm* records*',
+        'verify.json .gitignore .nojekyll .well-known index.htm* records*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run view\'`
     )
 }

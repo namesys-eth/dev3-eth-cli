@@ -72,7 +72,7 @@ export async function init() {
 
     // Push to Github
     await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
-        'verify.json .gitignore .nojekyll README.md records.json index.htm*',
+        'verify.json .gitignore .nojekyll records.json index.htm*',
         `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run sign\'`
     )
 }
