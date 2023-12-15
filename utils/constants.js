@@ -8,8 +8,8 @@ const buffer = "\x19Ethereum Signed Message:\n"
 const ipnsPrefix = '0xe5010172002408011220'
 const httpPrefix = '0x6874'
 const ipnsRegex = /^[a-z0-9]{62}$/
-const ipfsRegexCID0 = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/
-const ipfsRegexCID1 = /^bafy[a-zA-Z0-9]{55}$/
+const ipfsRegexCIDv0 = /^Qm[1-9A-HJ-NP-Za-km-z]{44}$/
+const ipfsRegexCIDv1 = /^b[0-9a-z]+[1-9A-HJ-NP-Za-km-z]+$/
 const onionRegex = /^[a-z2-7]{16,56}$/
 const urlRegex = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/
 const hexRegex = /^[0-9a-fA-F]+$/
@@ -25,7 +25,7 @@ const solRegex = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/
 const atomRegex = /^cosmos1[a-zA-Z0-9]{38}$/
 const validator = 'https://dev3.namesys.xyz/verify/'
 const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
-const resolver = '0x705FB9d0C36D962EE2732b8Bc4BBd8A08a2C026D'
+const resolver = '0x83c25DbcFD8d79a9E0F9f7f6cFc5b21716ACf469'
 const ALCHEMY_KEY_DEFAULT = 'UaFrPLamMm7GQFPc2-XRadQq7jU7uP9R'
 const NETWORK = 'goerli'
 const record = 'records.json'
@@ -83,8 +83,8 @@ export default {
   addressRegex,
   urlRegex,
   ipnsRegex,
-  ipfsRegexCID0,
-  ipfsRegexCID1,
+  ipfsRegexCIDv0,
+  ipfsRegexCIDv1,
   onionRegex,
   records,
   record,

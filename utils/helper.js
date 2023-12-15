@@ -75,8 +75,8 @@ function isURL(value) {
 function isContenthash(value) {
   return (
     constants.ipnsRegex.test(value.slice(7)) || // strip 'ipns://'
-    constants.ipfsRegexCID0.test(value.slice(7)) || // strip 'ipfs://'
-    constants.ipfsRegexCID0.test(value.slice(7)) || // strip 'ipfs://'
+    constants.ipfsRegexCIDv0.test(value.slice(7)) || // strip 'ipfs://'
+    constants.ipfsRegexCIDv1.test(value.slice(7)) || // strip 'ipfs://'
     constants.onionRegex.test(value.slice(8)) // strip 'onion://'
   )
 }
@@ -165,7 +165,7 @@ function validateGitRepo(rl) {
 function requestGithubID(detectedUser, rl) {
   return new Promise((resolve) => {
     rl.question(`⏰ Detected Github ID: ${detectedUser}. Confirm? [Y/N]: `, async (agree) => {
-      if (agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
+      if (!agree || agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
         resolve(true)
       } else if (agree.toLowerCase() === 'n' || agree.toLowerCase() === 'no') {
         resolve(false)
@@ -275,7 +275,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
         graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       }
       rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
-        if (attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
+        if (!attempt && attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
           const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
           resolve(_pushed)
           graphics.print(message, "lightgreen")

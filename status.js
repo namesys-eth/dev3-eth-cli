@@ -86,7 +86,7 @@ export async function status() {
         return new Promise(async (resolve) => {
             if (username) {
                 rl.question(`⏰ Detected Github ID: ${username}. Confirm? [Y/N]: `, async (agree) => {
-                    if (agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
+                    if (!agree || agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
                         await show(username, provider)
                         resolve(true)
                     } else if (agree.toLowerCase() === 'n' || agree.toLowerCase() === 'no') {

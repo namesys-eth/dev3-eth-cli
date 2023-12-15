@@ -77,7 +77,7 @@ export async function publish() {
                             resolve([true, _addr60_])
                         } else {
                             graphics.print('⛔ Bad Input', "orange")
-                            resolve(await write_addr60()) // Recursive call
+                            resolve(await write_addr60(_addr60_)) // Recursive call
                         }
                     } else {
                         _addr60_[0].value = null
@@ -104,7 +104,7 @@ export async function publish() {
                             resolve([true, _avatar_])
                         } else {
                             graphics.print('⛔ Bad Input', "orange")
-                            resolve(await write_avatar()) // Recursive call
+                            resolve(await write_avatar(_avatar_)) // Recursive call
                         }
                     } else {
                         _avatar_[0].value = null
@@ -131,7 +131,7 @@ export async function publish() {
                             resolve([true, _contenthash_])
                         } else {
                             graphics.print('⛔ Bad Input! Resetting...', "orange")
-                            resolve(await writeRecords()) // Recursive call
+                            resolve(await write_contenthash(_contenthash_)) // Recursive call
                         }
                     } else {
                         _contenthash_[0].value = null

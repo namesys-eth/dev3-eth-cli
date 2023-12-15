@@ -37,12 +37,12 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 | `GLOBAL` | `npm i -g dev3-eth`  | `npx dev3-eth init` | `npx dev3-eth sign` | `npx dev3-eth status` |
 | `LOCAL`  | `[1]`                | `npm run init`      | `npm run sign`      | `npm run status`      |
 
-> 💡 HINT: If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
+> 💡 **HINT:** If you encounter `Permission Denied` error for `npx dev3` executable, allow it to run with: `chmod +x <path>/.bin/dev3`
 
 ### `[1]`
 
 ```bash
-VERSION=0.1.8-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.2.0-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ---
@@ -81,7 +81,7 @@ npx dev3-eth view
 ### Install Package
 
 ```bash
-VERSION=0.1.8-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.2.0-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ### Initialise `sub.dev3.eth` 
