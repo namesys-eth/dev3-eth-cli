@@ -42,7 +42,7 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 ### `[1]`
 
 ```bash
-VERSION=0.2.1-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.2.2-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ---
@@ -81,7 +81,7 @@ npx dev3-eth view
 ### Install Package
 
 ```bash
-VERSION=0.2.1-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.2.2-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ### Initialise `sub.dev3.eth` 
