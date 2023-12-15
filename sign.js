@@ -8,46 +8,11 @@ import { execSync } from 'child_process'
 const require = createRequire(import.meta.url)
 require('dotenv').config()
 
-export async function publish() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    })
+export async function sign() {
 
-    // WELCOME!
-    console.log()
-    graphics.print(graphics.asciiArt, 'orange')
-    graphics.logo()
-    graphics.print(graphics.signAsciiArt, 'orange')
-    console.log()
-
-    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
-    let userDetected = undefined
-    if (isGitRepo && detectedUser && synced) {
-        userDetected = await helper.requestGithubID(detectedUser, rl)
-    } else {
-        graphics.print(`❌ Quitting...`, "orange")
-        rl.close()
-    }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, constants.verify) : await helper.validateGithubID(rl, constants.verify)) : false
-
-    // Define Records
-    let addr60 = [
-        { ...constants.recordContent },
-        `.well-known/eth/dev3/${detectedUser}/address/60.json`
-    ]
-    let avatar = [
-        { ...constants.recordContent },
-        `.well-known/eth/dev3/${detectedUser}/text/avatar.json`
-    ]
-    let contenthash = [
-        { ...constants.recordContent },
-        `.well-known/eth/dev3/${detectedUser}/contenthash.json`
-    ]
-    /* Define more ENS Records here */
-
+    // FUNC ============================================
     // Initiates writing ENS Records
-    async function writeRecords() {
+    async function writeRecords(welcome) {
         if (welcome) {
             return new Promise(async (resolve) => {
                 graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
@@ -58,16 +23,15 @@ export async function publish() {
                         resolve(false)
                     } else {
                         graphics.print('⛔ Bad Input', "orange")
-                        resolve(await writeRecords()) // Recursive call
+                        resolve(await writeRecords(welcome)) // Recursive call
                     }
                 })
             })
         }
     }
-    let written = await writeRecords()
 
     // Writes ENS Records: addr60
-    async function write_addr60(_addr60_) {
+    async function write_addr60(_addr60_, welcome, written) {
         if (welcome && written) {
             return new Promise(async (resolve) => {
                 rl.question('📝 Please enter your ETH address (address/60) and then press ENTER: ', async (_addr60) => {
@@ -77,7 +41,7 @@ export async function publish() {
                             resolve([true, _addr60_])
                         } else {
                             graphics.print('⛔ Bad Input', "orange")
-                            resolve(await write_addr60(_addr60_)) // Recursive call
+                            resolve(await write_addr60(_addr60_, welcome, written)) // Recursive call
                         }
                     } else {
                         _addr60_[0].value = null
@@ -91,10 +55,9 @@ export async function publish() {
             })
         }
     }
-    let [written_addr60, _addr60] = await write_addr60(addr60)
-    addr60 = _addr60
+
     // Writes ENS Records: avatar
-    async function write_avatar(_avatar_) {
+    async function write_avatar(_avatar_, welcome, written, written_addr60) {
         if (welcome && written && written_addr60) {
             return new Promise(async (resolve) => {
                 rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
@@ -104,7 +67,7 @@ export async function publish() {
                             resolve([true, _avatar_])
                         } else {
                             graphics.print('⛔ Bad Input', "orange")
-                            resolve(await write_avatar(_avatar_)) // Recursive call
+                            resolve(await write_avatar(_avatar_, welcome, written, written_addr60)) // Recursive call
                         }
                     } else {
                         _avatar_[0].value = null
@@ -118,10 +81,9 @@ export async function publish() {
             })
         }
     }
-    let [written_avatar, _avatar] = await write_avatar(avatar)
-    avatar = _avatar
+
     // Writes ENS Records: contenthash
-    async function write_contenthash(_contenthash_) {
+    async function write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar) {
         if (welcome && written && written_addr60 && written_avatar) {
             return new Promise(async (resolve) => {
                 rl.question('📝 Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
@@ -131,7 +93,7 @@ export async function publish() {
                             resolve([true, _contenthash_])
                         } else {
                             graphics.print('⛔ Bad Input! Resetting...', "orange")
-                            resolve(await write_contenthash(_contenthash_)) // Recursive call
+                            resolve(await write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar)) // Recursive call
                         }
                     } else {
                         _contenthash_[0].value = null
@@ -145,11 +107,9 @@ export async function publish() {
             })
         }
     }
-    let [written_contenthash, _contenthash] = await write_contenthash(contenthash)
-    contenthash = _contenthash
 
     // Confirms ENS Records
-    async function confirmRecords(detectedUser) {
+    async function confirmRecords(detectedUser, written, written_contenthash) {
         if (welcome && !written) {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
@@ -191,23 +151,22 @@ export async function publish() {
                     resolve(true)
                 })
             })
-        } else if (welcome && written) {
+        } else if (welcome && written && written_contenthash) {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please Confirm Records Update (press ENTER to confirm; CTRL + C to exit): `, async (done) => {
                     if (!done) {
                         resolve(true)
                     } else {
                         graphics.print('⛔ Bad Input', "orange")
-                        resolve(await confirmRecords(detectedUser)) // Recursive call
+                        resolve(await confirmRecords(detectedUser, written, written_contenthash)) // Recursive call
                     }
                 })
             })
         }
     }
-    let confirmed = await confirmRecords(detectedUser)
 
     // Verifies ENS Records
-    async function verifyRecords() {
+    async function verifyRecords(welcome, confirmed) {
         if (welcome && confirmed) {
             return new Promise(async (resolve) => {
                 let __addr60 = { ...constants.recordContent }
@@ -270,10 +229,9 @@ export async function publish() {
             })
         }
     }
-    const verified = await verifyRecords()
 
     // Signs ENS Records
-    async function signRecords(detectedUser, record, type, key, resolver) {
+    async function signRecords(detectedUser, record, type, key, resolver, welcome, verified) {
         if (welcome && record) {
             if (verified) {
                 return new Promise(async (resolve) => {
@@ -303,39 +261,8 @@ export async function publish() {
         }
     }
 
-    // Sign addr60
-    const [payload_addr60, signature_addr60] = await signRecords(
-        detectedUser,
-        JSON.parse(
-            readFileSync(constants.record, 'utf-8')
-        ).records.address.eth,
-        'address/60',
-        'address',
-        constants.resolver
-    )
-    // Sign avatar
-    const [payload_avatar, signature_avatar] = await signRecords(
-        detectedUser,
-        JSON.parse(
-            readFileSync(constants.record, 'utf-8')
-        ).records.text.avatar,
-        'text/avatar',
-        'avatar',
-        constants.resolver
-    )
-    // Sign contenthash
-    const [payload_contenthash, signature_contenthash] = await signRecords(
-        detectedUser,
-        JSON.parse(
-            readFileSync(constants.record, 'utf-8')
-        ).records.contenthash,
-        'contenthash',
-        'contenthash',
-        constants.resolver
-    )
-
     // Gets status of CF approval
-    async function getStatus(detectedUser) {
+    async function getStatus(detectedUser, welcome) {
         if (welcome) {
             return new Promise(async (resolve) => {
                 let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
@@ -414,8 +341,93 @@ export async function publish() {
                 resolve(false)
             })
         }
-    } 
-    const validated = await getStatus(detectedUser)
+    }
+
+    // CLI
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    })
+    // WELCOME!
+    console.log()
+    graphics.print(graphics.asciiArt, 'orange')
+    graphics.logo()
+    graphics.print(graphics.signAsciiArt, 'orange')
+    console.log()
+
+    // Check Git Repository
+    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
+    let userDetected = undefined
+    if (isGitRepo && detectedUser && synced) {
+        userDetected = await helper.requestGithubID(detectedUser, rl)
+    } else {
+        graphics.print(`❌ Quitting...`, "orange")
+        rl.close()
+    }
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, constants.verify) : await helper.validateGithubID(rl, constants.verify)) : false
+
+    // MAIN ============================================
+    // Define Records
+    let addr60 = [
+        { ...constants.recordContent },
+        `.well-known/eth/dev3/${detectedUser}/address/60.json`
+    ]
+    let avatar = [
+        { ...constants.recordContent },
+        `.well-known/eth/dev3/${detectedUser}/text/avatar.json`
+    ]
+    let contenthash = [
+        { ...constants.recordContent },
+        `.well-known/eth/dev3/${detectedUser}/contenthash.json`
+    ]
+    /* Define more ENS Records here */
+
+    let written = await writeRecords(welcome)
+    let [written_addr60, _addr60] = await write_addr60(addr60, welcome, written)
+    addr60 = _addr60
+    let [written_avatar, _avatar] = await write_avatar(avatar, welcome, written, written_addr60)
+    avatar = _avatar
+    let [written_contenthash, _contenthash] = await write_contenthash(contenthash, welcome, written, written_addr60, written_avatar)
+    contenthash = _contenthash
+    let confirmed = await confirmRecords(detectedUser, written, written_contenthash)
+    const verified = await verifyRecords(welcome, confirmed)
+    // Sign addr60
+    const [payload_addr60, signature_addr60] = await signRecords(
+        detectedUser,
+        JSON.parse(
+            readFileSync(constants.record, 'utf-8')
+        ).records.address.eth,
+        'address/60',
+        'address',
+        constants.resolver,
+        welcome, 
+        verified
+    )
+    // Sign avatar
+    const [payload_avatar, signature_avatar] = await signRecords(
+        detectedUser,
+        JSON.parse(
+            readFileSync(constants.record, 'utf-8')
+        ).records.text.avatar,
+        'text/avatar',
+        'avatar',
+        constants.resolver,
+        welcome, 
+        verified
+    )
+    // Sign contenthash
+    const [payload_contenthash, signature_contenthash] = await signRecords(
+        detectedUser,
+        JSON.parse(
+            readFileSync(constants.record, 'utf-8')
+        ).records.contenthash,
+        'contenthash',
+        'contenthash',
+        constants.resolver,
+        welcome, 
+        verified
+    )
+    const validated = await getStatus(detectedUser, welcome)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll README.md .well-known index.htm* records*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run view\'`

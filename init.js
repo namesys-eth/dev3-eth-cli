@@ -7,26 +7,8 @@ const require = createRequire(import.meta.url)
 require('dotenv').config()
 
 export async function init() {
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    })
 
-    // WELCOME!
-    console.log()
-    graphics.print(graphics.asciiArt, 'orange')
-    graphics.logo()
-    graphics.print(graphics.initAsciiArt, 'orange')
-    console.log()
-
-    // Check Git Repository
-    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
-    let userDetected = undefined
-    if (isGitRepo && detectedUser && synced) {
-        userDetected = await helper.requestGithubID(detectedUser, rl)
-    }
-    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, '') : await helper.validateGithubID(rl, '')) : false
-
+    // FUNC ============================================
     // Gets Signer Keypair
     async function getSigner() {
         if (welcome && synced) {
@@ -50,9 +32,8 @@ export async function init() {
             })
         }
     }
-    const keypair = await getSigner()
 
-    // Set Signer key
+    // Sets Signer key
     async function setKeypair(keypair) {
         if (keypair) {
             return new Promise(async (resolve) => {
@@ -62,7 +43,34 @@ export async function init() {
             })
         }
     }
+
+    // CLI
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    })
+
+    // WELCOME!
+    console.log()
+    graphics.print(graphics.asciiArt, 'orange')
+    graphics.logo()
+    graphics.print(graphics.initAsciiArt, 'orange')
+    console.log()
+
+    // Check Git Repository
+    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
+    let userDetected = undefined
+    if (isGitRepo && detectedUser && synced) {
+        userDetected = await helper.requestGithubID(detectedUser, rl)
+    }
+    const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, '') : await helper.validateGithubID(rl, '')) : false
+    const keypair = await getSigner()
+
+    // MAIN ============================================
+    // Generate Or Request Keypair
     const configured = await setKeypair(keypair)
+
+    // Push to Github
     await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll README.md records.json index.htm*',
         `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run sign\'`

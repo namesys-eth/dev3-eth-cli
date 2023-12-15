@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { init } from "./init.js"
-import { publish } from "./publish.js"
-import { status } from "./status.js"
+import { sign } from "./sign.js"
+import { view } from "./view.js"
 import graphics from './utils/graphics.js'
 
 // Check for command-line arguments
@@ -9,9 +9,9 @@ const args = process.argv.slice(2)
 if (args[0] === "init") {
     init()
 } else if (args[0] === "sign") {
-    publish()
+    sign()
 } else if (args[0] === "view") {
-    status()
+    view()
 } else {
     // WELCOME!
     graphics.print(graphics.asciiArt, 'orange')
@@ -33,7 +33,7 @@ if (args.length > 1) {
             sign()
             break
         case 'view':
-            status()
+            view()
             break
         default:
             console.log('Invalid function name (available functions: init, sign, view)')

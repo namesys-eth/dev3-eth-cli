@@ -8,57 +8,74 @@ import { createRequire } from 'module'
 const require = createRequire(import.meta.url)
 require('dotenv').config()
 
-async function show(githubID, provider) {
-    if (helper.isValidGithubID(githubID)) {
-        let domain = `${githubID}.dev3.eth`
-        graphics.print(`🔎 Searching...`, 'skyblue')
-        graphics.print(`     DOMAIN: ${domain}`, "white")
-        try { // Get Resolver
-            const resolver = await provider.getResolver(domain)
-            graphics.print(`   RESOLVER: ${resolver.address}`, "lightgreen")
-        } catch {
-            graphics.print(`   RESOLVER: null`, "orange")
-        }
-        try { // Get addr60
-            const addr60 = await provider.resolveName(domain)
-            graphics.print(`    ADDRESS: ${addr60}`, "lightgreen")
-        } catch {
-            graphics.print(`    ADDRESS: null`, "yellow")
-        }
-        try { // Get avatar
-            const avatar = await resolver.getText('avatar')
-            graphics.print(`     AVATAR: ${avatar}`, "lightgreen")
-        } catch {
-            graphics.print(`     AVATAR: null`, "yellow")
-        }
-        try { // Get contenthash
-            const contenthash = await resolver.getContentHash()
-            graphics.print(`CONTENTHASH: ${contenthash}`, "lightgreen")
-        } catch {
-            graphics.print(`CONTENTHASH: null`, "yellow")
-        }
-        graphics.print(`👋 BYEE!`, "lightgreen")
-        return true
-    } else {
-        graphics.print(`❌ Bad Github ID! Quitting...`, "orange")
-        return false
-    }
-}
+// main
+export async function view() {
 
-async function confirm(rl) {
-    return new Promise(async (resolve) => {
-        rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
-            if (helper.isValidGithubID(githubID)) {
-                resolve(githubID)
+    // MAIN ============================================
+    const space = `     `
+
+    // Shows ENS Records
+    async function show(githubID, provider) {
+        if (helper.isValidGithubID(githubID)) {
+            let domain = `${githubID}.dev3.eth`
+            graphics.print(`🔎 Searching...`, 'skyblue')
+            graphics.print(`${space}  DOMAIN: ${domain}`, "white")
+            try { // Get Resolver
+                const resolver = await provider.getResolver(domain)
+                graphics.print(`${space}RESOLVER: ${resolver.address}`, "lightgreen")
+            } catch {
+                graphics.print(`${space}RESOLVER: NOT_SET`, "orange")
+            }
+            try { // Get addr60
+                const addr60 = await provider.resolveName(domain)
+                graphics.print(`${space} ADDRESS: ${addr60} [1]`, "lightgreen")
+            } catch {
+                graphics.print(`${space} ADDRESS: [1]`, "yellow")
+            }
+            try { // Get avatar
+                const avatar = await resolver.getText('avatar')
+                graphics.print(`${space}  AVATAR: ${avatar} [2]`, "lightgreen")
+            } catch {
+                graphics.print(`${space}  AVATAR: [2]`, "yellow")
+            }
+            try { // Get contenthash
+                const contenthash = await resolver.getContentHash()
+                graphics.print(`  CONTENTHASH: ${contenthash} [3]`, "lightgreen")
+            } catch {
+                graphics.print(`  CONTENTHASH: [3]`, "yellow")
+            }
+            return true
+        } else {
+            graphics.print(`❌ Bad Github ID! Quitting...`, "orange")
+            return false
+        }
+    }
+
+    // Debugs ENS Records
+    async function debug() {
+        rl.question('🚧 Debug ENS Record? (enter index [1/2/3/N]): ', async (debug) => {
+            if (['1', '2', '3'].includes(debug)) {
+                resolve(true)
             } else {
-                graphics.print('⛔ Bad Input', "orange")
+                graphics.print(`👋 BYEE!`, "lightgreen")
                 resolve(null)
             }
         })
-    })
-}
+    }
 
-export async function status() {
+    // Confirm Github ID
+    async function confirm(rl) {
+        return new Promise(async (resolve) => {
+            rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
+                if (helper.isValidGithubID(githubID)) {
+                    resolve(githubID)
+                } else {
+                    graphics.print('⛔ Bad Input', "orange")
+                    resolve(null)
+                }
+            })
+        })
+    }
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
@@ -79,6 +96,7 @@ export async function status() {
         provider = new ethers.AlchemyProvider(constants.NETWORK, constants.ALCHEMY_KEY_DEFAULT)
     }
 
+    // MAIN ============================================
     // Check status
     const remoteUrl = execSync('git config --get remote.origin.url').toString().trim()
     const username = remoteUrl.match(/github\.com[:/](\w+[-_]?\w+)/)[1]
