@@ -223,17 +223,17 @@ const print = (text, color) => {
 function logo() {
   for (let i = 0; i < letter3.length; i++) {
     print(
-        combineLetters(
-            ' ',
-            letterD[i],
-            letterE[i],
-            letterV[i],
-            letter3[i],
-            letter_[i],
-            lettere[i],
-            lettert[i],
-            letterh[i]
-        ), "green"
+      combineLetters(
+        ' ',
+        letterD[i],
+        letterE[i],
+        letterV[i],
+        letter3[i],
+        letter_[i],
+        lettere[i],
+        lettert[i],
+        letterh[i]
+      ), "green"
     )
   }
 }

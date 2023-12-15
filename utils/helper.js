@@ -275,7 +275,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
         graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       }
       rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
-        if (!attempt && attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
+        if (!attempt || attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
           const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
           resolve(_pushed)
           graphics.print(message, "lightgreen")
@@ -367,9 +367,21 @@ async function writeConfig(signerKey) {
   return true
 }
 
+// Payload for an ENS Record
+async function payloadRecord(gateway, chainID, resolver, recordType, extradata, signer) {
+  let _toSign = `Requesting Signature To Update ENS Record\n\nGateway: ${gateway}\nResolver: eip155:${chainID}:${resolver}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: eip155:${chainID}:${signer}`
+  return _toSign
+}
+
+// Payload of Cloudflare approval
+async function payloadCloudflare(gateway, chainID, resolver, signer) {
+  let _toSign = `Requesting Signature To Approve ENS Records Signer\n\nGateway: ${gateway}\nResolver: eip155:${chainID}:${resolver}\nApproved Signer: eip155:${chainID}:${signer}`
+  return _toSign
+}
+
 // Signs an ENS Record
 async function signRecord(gateway, chainID, resolver, recordType, extradata, signer) {
-  let _toSign = `Requesting Signature To Update ENS Record\n\nGateway: ${gateway}\nResolver: eip155:${chainID}:${resolver}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: ${signer}`
+  let _toSign = `Requesting Signature To Update ENS Record\n\nGateway: ${gateway}\nResolver: eip155:${chainID}:${resolver}\nRecord Type: ${recordType}\nExtradata: ${extradata}\nSigned By: eip155:${chainID}:${signer}`
   let _key = new SigningKey(SIGNER.slice(0, 2) === "0x" ? SIGNER : "0x" + SIGNER)
   let _signer = new Wallet(_key)
   let signature = await _signer.signMessage(_toSign)
@@ -466,5 +478,7 @@ export default {
   isURL,
   isContenthash,
   encodeValue,
-  genExtradata
+  genExtradata,
+  payloadRecord,
+  payloadCloudflare
 }

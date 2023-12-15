@@ -400,7 +400,7 @@ export async function sign() {
         'address/60',
         'address',
         constants.resolver,
-        welcome, 
+        welcome,
         verified
     )
     // Sign avatar
@@ -412,7 +412,7 @@ export async function sign() {
         'text/avatar',
         'avatar',
         constants.resolver,
-        welcome, 
+        welcome,
         verified
     )
     // Sign contenthash
@@ -424,7 +424,7 @@ export async function sign() {
         'contenthash',
         'contenthash',
         constants.resolver,
-        welcome, 
+        welcome,
         verified
     )
     const validated = await getStatus(detectedUser, welcome)
