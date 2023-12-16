@@ -339,7 +339,7 @@ export async function sign() {
                     }
                     // contenthash
                     if (_buffer.records.contenthash) {
-                        let _contenthash = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
+                        let _contenthash = JSON.parse(readFileSync(constants.records.contenthash, 'utf-8'))
                         _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
                         _contenthash.signer = _verify.signer
                         _contenthash.signature = signature_contenthash
