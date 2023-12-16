@@ -109,8 +109,8 @@ export async function sign() {
     }
 
     // Confirms ENS Records
-    async function confirmRecords(detectedUser, written, written_contenthash) {
-        if (welcome && !written) {
+    async function confirmRecords(detectedUser, written, written_contenthash, addr60, avatar, contenthash) {
+        if (welcome && !written && !written_contenthash) {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
                     let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
@@ -120,7 +120,6 @@ export async function sign() {
                     addr60[0].value = _buffer.records.address.eth
                     avatar[0].value = _buffer.records.text.avatar
                     contenthash[0].value = _buffer.records.contenthash
-                    writeFileSync(constants.record, JSON.stringify(_buffer, null, 2))
                     // addr60
                     if (_buffer.records.address.eth) {
                         const _file = await helper.createDeepFile(constants.records.addr60)
@@ -155,10 +154,45 @@ export async function sign() {
             return new Promise(async (resolve) => {
                 rl.question(`⏰ Please Confirm Records Update (press ENTER to confirm; CTRL + C to exit): `, async (done) => {
                     if (!done) {
+                        let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
+                        // Write to buffer
+                        _buffer.githubid = detectedUser
+                        _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
+                        _buffer.records.address.eth = addr60[0].value
+                        _buffer.records.text.avatar = avatar[0].value
+                        _buffer.records.contenthash = contenthash[0].value
+                        writeFileSync(constants.record, JSON.stringify(_buffer, null, 2))
+                        // addr60
+                        if (_buffer.records.address.eth) {
+                            const _file = await helper.createDeepFile(constants.records.addr60)
+                            if (_file) {
+                                writeFileSync(constants.records.addr60, JSON.stringify(addr60[0], null, 2))
+                            } else {
+                                resolve(false)
+                            }
+                        }
+                        // avatar
+                        if (_buffer.records.text.avatar) {
+                            const _file = await helper.createDeepFile(constants.records.avatar)
+                            if (_file) {
+                                writeFileSync(constants.records.avatar, JSON.stringify(avatar[0], null, 2))
+                            } else {
+                                resolve(false)
+                            }
+                        }
+                        // contenthash
+                        if (_buffer.records.contenthash) {
+                            const _file = await helper.createDeepFile(constants.records.contenthash)
+                            if (_file) {
+                                writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                            } else {
+                                resolve(false)
+                            }
+                        }
                         resolve(true)
                     } else {
                         graphics.print('⛔ Bad Input', "orange")
-                        resolve(await confirmRecords(detectedUser, written, written_contenthash)) // Recursive call
+                        resolve(await confirmRecords(detectedUser, written, written_contenthash, addr60, avatar, contenthash)) // Recursive call
                     }
                 })
             })
@@ -389,7 +423,7 @@ export async function sign() {
     avatar = _avatar
     let [written_contenthash, _contenthash] = await write_contenthash(contenthash, welcome, written, written_addr60, written_avatar)
     contenthash = _contenthash
-    let confirmed = await confirmRecords(detectedUser, written, written_contenthash)
+    let confirmed = await confirmRecords(detectedUser, written, written_contenthash, addr60, avatar, contenthash)
     const verified = await verifyRecords(welcome, confirmed)
     // Sign addr60
     const [payload_addr60, signature_addr60] = await signRecords(
