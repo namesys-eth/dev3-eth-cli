@@ -16,7 +16,7 @@ export async function sign() {
         if (welcome) {
             return new Promise(async (resolve) => {
                 graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
-                rl.question('⏰ Continue in next step? [Y] OR, Update Manually? [N]: ', async (auto) => {
+                rl.question('⏰ Continue in next step? [Y] OR, update manually? [N]: ', async (auto) => {
                     if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
                         resolve(true)
                     } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
@@ -340,7 +340,7 @@ export async function sign() {
                     // contenthash
                     if (_buffer.records.contenthash) {
                         let _contenthash = JSON.parse(readFileSync(constants.records.contenthash, 'utf-8'))
-                        _contenthash.data = helper.encodeValue("avatar", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
+                        _contenthash.data = helper.encodeValue("contenthash", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
                         _contenthash.signer = _verify.signer
                         _contenthash.signature = signature_contenthash
                         _contenthash.approved = true

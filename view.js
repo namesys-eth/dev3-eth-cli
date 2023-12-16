@@ -34,8 +34,14 @@ export async function view() {
             let domain = `${githubID}.dev3.eth`
             graphics.print(`🔎 Searching...`, 'skyblue')
             graphics.print(`${space}  DOMAIN: ${domain}`, "white")
+            let resolver
+            let _error = {
+                addr60: null,
+                avatar: null,
+                contenthash: null
+            }
             try { // Get Resolver
-                const resolver = await provider.getResolver(domain)
+                resolver = await provider.getResolver(domain)
                 graphics.print(`${space}RESOLVER: ${resolver.address}`, "lightgreen")
             } catch {
                 graphics.print(`${space}RESOLVER: NOT_SET`, "orange")
@@ -43,26 +49,29 @@ export async function view() {
             try { // Get addr60
                 const addr60 = await provider.resolveName(domain)
                 graphics.print(`${space} ADDRESS: ${addr60} [1]`, "lightgreen")
-            } catch {
-                graphics.print(`${space} ADDRESS: [1]`, "yellow")
+            } catch (error) {
+                graphics.print(`${space} ADDRESS: ... [1]`, "yellow")
+                _error.addr60 = error
             }
             try { // Get avatar
                 const avatar = await resolver.getText('avatar')
                 graphics.print(`${space}  AVATAR: ${avatar} [2]`, "lightgreen")
-            } catch {
-                graphics.print(`${space}  AVATAR: [2]`, "yellow")
+            } catch (error) {
+                graphics.print(`${space}  AVATAR: ... [2]`, "yellow")
+                _error.avatar = error
             }
             try { // Get contenthash
                 const contenthash = await resolver.getContentHash()
                 graphics.print(`  CONTENTHASH: ${contenthash} [3]`, "lightgreen")
-            } catch {
-                graphics.print(`  CONTENTHASH: [3]`, "yellow")
+            } catch (error) {
+                graphics.print(`  CONTENTHASH: ... [3]`, "yellow")
+                _error.contenthash = error
             }
             console.log()
-            return true
+            return _error
         } else {
             graphics.print(`❌ Bad Github ID! Quitting...`, "orange")
-            return false
+            return null
         }
     }
 
@@ -70,14 +79,16 @@ export async function view() {
     async function status(username, provider, rl) {
         return new Promise(async (resolve) => {
             if (username) {
+                let _error
                 rl.question(`⏰ Detected Github ID: ${username}. Confirm? [Y/N]: `, async (agree) => {
                     if (!agree || agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
-                        await show(username, provider)
-                        resolve(true)
+                        _error = await show(username, provider)
+                        resolve(_error)
                     } else if (agree.toLowerCase() === 'n' || agree.toLowerCase() === 'no') {
                         const askName = await confirm(rl)
                         if (askName) {
-                            await show(askName, provider)
+                            _error = await show(askName, provider)
+                            resolve(_error)
                         } else {
                             await status(username, provider, rl) // Recursive call
                         }
@@ -88,17 +99,19 @@ export async function view() {
                 })
             } else {
                 const askName = await confirm(rl)
+                let _error
                 if (askName) {
-                    await show(askName, provider)
+                    _error = await show(askName, provider)
+                    resolve(_error)
                 } else {
-                    await status(username, provider) // Recursive call
+                    await status(username, provider, rl) // Recursive call
                 }
             }
         })
     }
 
     // Debugs ENS Records
-    async function debug(rl, username) {
+    async function debug(rl, username, error) {
         return new Promise(async (resolve) => {
             rl.question('🚧 Debug ENS Records? [Y/N]: ', async (_debug) => {
                 if (!_debug || _debug.toLowerCase() === 'y' || _debug.toLowerCase() === 'yes') {
@@ -110,6 +123,7 @@ export async function view() {
                     let approval
                     if (!response.ok) {
                         graphics.print(`❗ [Fetch] Failed to fetch records file \'records.json\': error ${response.status}`, "orange")
+                        resolve(await debug(rl, username, error))
                     } else {
                         graphics.print(`⬇️  [Fetch] Fetching records file: \'records.json\'`, "cyan")
                         const data = await response.json()
@@ -119,21 +133,28 @@ export async function view() {
                     await verifyCloudflare(username, signer, approval, constants.approver)
                     rl.question('🚧 Enter [index] of record to debug? (enter index [1/2/3/N]): ', async (_index) => {
                         if (['1', '2', '3'].includes(_index)) {
+                            let key
+                            if (_index === '1') key = 'addr60'
+                            if (_index === '2') key = 'avatar'
+                            if (_index === '3') key = 'contenthash'
+                            console.log('❗ [`LOG]: ', error[key])
                             resolve([_index, signer])
                         } else if (_index.toLowerCase() === 'n' || _index.toLowerCase() === 'no') {
                             graphics.print(`👋 OK, BYEE!`, "lightgreen")
                             resolve([null, signer])
+                            rl.close()
                         } else {
                             graphics.print('⛔ Bad Input', "orange")
-                            resolve(await debug(rl, username))
+                            resolve(await debug(rl, username, error))
                         }
                     })
                 } else if (_debug.toLowerCase() === 'n' || _debug.toLowerCase() === 'no') {
                     graphics.print(`👋 OK, BYEE!`, "lightgreen")
                     resolve([null, null])
+                    rl.close()
                 } else {
                     graphics.print('⛔ Bad Input', "orange")
-                    resolve(await debug(rl, username))
+                    resolve(await debug(rl, username, error))
                 }
             })
         })
@@ -226,45 +247,50 @@ export async function view() {
 
     // Verifies Records Signature
     async function verifySignature(username, index, signer) {
-        let key
-        let type
-        if (index === 1) {
-            key = 'address'
-            type = 'address/60'
-        }
-        if (index === 2) {
-            key = 'avatar'
-            type = 'text/avatar'
-        }
-        if (index === 3) {
-            key = 'contenthash'
-            type = 'contenthash'
-        }
-        let _url = `https://${username}.github.io/.well-known/eth/dev3/${username}/${type}.json`
-        let response = await fetch(_url)
-        let value
-        let signature
-        if (!response.ok) {
-            graphics.print(`❗ [Fetch] Failed to fetch records file \'${type}.json\': error ${response.status}`, "orange")
-        } else {
-            const data = await response.json()
-            value = data.value
-            signature = data.signature
-            const payload = await helper.payloadRecord(
-                `https://${username}.github.io`,
-                '5',
-                constants.resolver,
-                type,
-                helper.genExtradata(key, value),
-                signer
-            )
-            const _signer = ethers.verifyMessage(payload, signature)
-            if (_signer === signer) {
-                graphics.print(`✅ Verified Signature for: ${type}`, "lightgreen")
-            } else {
-                graphics.print(`❗ Bad \'signature:\' in \'${type}.json\'`, "orange")
+        return new Promise(async (resolve) => {
+            let key
+            let type
+            if (index === 1) {
+                key = 'address'
+                type = 'address/60'
             }
-        }
+            if (index === 2) {
+                key = 'avatar'
+                type = 'text/avatar'
+            }
+            if (index === 3) {
+                key = 'contenthash'
+                type = 'contenthash'
+            }
+            let _url = `https://${username}.github.io/.well-known/eth/dev3/${username}/${type}.json`
+            let response = await fetch(_url)
+            let value
+            let signature
+            if (!response.ok) {
+                graphics.print(`❗ [Signature] Failed to fetch records file \'${type}.json\': error ${response.status}`, "orange")
+                resolve(true)
+            } else {
+                const data = await response.json()
+                value = data.value
+                signature = data.signature
+                const payload = await helper.payloadRecord(
+                    `https://${username}.github.io`,
+                    '5',
+                    constants.resolver,
+                    type,
+                    helper.genExtradata(key, value),
+                    signer
+                )
+                const _signer = ethers.verifyMessage(payload, signature)
+                if (_signer === signer) {
+                    graphics.print(`✅ Verified Signature for: ${type}`, "lightgreen")
+                    resolve(true)
+                } else {
+                    graphics.print(`❗ Bad \'signature:\' in \'${type}.json\'`, "orange")
+                    resolve(true)
+                }
+            }
+        })
     }
 
     // Verifies Cloudflare approval
@@ -308,12 +334,22 @@ export async function view() {
     // Check status
     const remoteUrl = execSync('git config --get remote.origin.url').toString().trim()
     const username = remoteUrl.match(/github\.com[:/](\w+[-_]?\w+)/)[1]
-    await status(username, provider, rl)
-
-    // Verify record files & Cloudflare approval
-    const [_debug, signer] = await debug(rl, username)
-    // Verify Signatures
-    if (_debug && _debug != null) await verifySignature(username, Number(_debug), signer)
-    rl.close()
+    let error = await status(username, provider, rl)
+    async function verifyAndDebug() {
+        // Verify record files & Cloudflare approval
+        let [_debug, signer] = await debug(rl, username, error);
+        // Verify Signatures
+        if (_debug && _debug !== null) {
+            const trigger = await verifySignature(username, Number(_debug), signer);
+            if (!trigger) {
+                graphics.print(`🤞 HOPE IT HELPED!`, "lightgreen")
+                rl.close()
+            } else {
+                graphics.print('🧪 Continuing de-bugger...', "skyblue")
+                await verifyAndDebug()
+            }
+        }
+    }
+    await verifyAndDebug()
 }
 
