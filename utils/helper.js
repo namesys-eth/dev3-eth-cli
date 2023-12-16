@@ -385,7 +385,6 @@ async function signRecord(gateway, chainID, resolver, recordType, extradata, sig
   let _key = new SigningKey(SIGNER.slice(0, 2) === "0x" ? SIGNER : "0x" + SIGNER)
   let _signer = new Wallet(_key)
   let signature = await _signer.signMessage(_toSign)
-  console.log(_toSign)
   return [_toSign, signature]
 }
 
