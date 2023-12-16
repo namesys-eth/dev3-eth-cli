@@ -313,7 +313,7 @@ export async function view() {
     // Verify record files & Cloudflare approval
     const [_debug, signer] = await debug(rl, username)
     // Verify Signatures
-    await verifySignature(username, Number(_debug), signer)
+    if (_debug && _debug != null) await verifySignature(username, Number(_debug), signer)
     rl.close()
 }
 
