@@ -296,7 +296,7 @@ export async function sign() {
     }
 
     // Gets status of CF approval
-    async function getStatus(detectedUser, welcome) {
+    async function getStatus(detectedUser, welcome, payload) {
         if (welcome) {
             return new Promise(async (resolve) => {
                 let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
@@ -322,6 +322,7 @@ export async function sign() {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
                         _addr60.data = helper.encodeValue("address", _addr60.value, _verify.signer, signature_addr60, verifier.approvalSig)
                         _addr60.signer = _verify.signer
+                        _addr60.payload = payload.addr60
                         _addr60.signature = signature_addr60
                         _addr60.approved = true
                         _addr60.approval = verifier.approvalSig
@@ -332,6 +333,7 @@ export async function sign() {
                         let _avatar = JSON.parse(readFileSync(constants.records.avatar, 'utf-8'))
                         _avatar.data = helper.encodeValue("avatar", _avatar.value, _verify.signer, signature_avatar, verifier.approvalSig)
                         _avatar.signer = _verify.signer
+                        _avatar.payload = payload.avatar
                         _avatar.signature = signature_avatar
                         _avatar.approved = true
                         _avatar.approval = verifier.approvalSig
@@ -342,6 +344,7 @@ export async function sign() {
                         let _contenthash = JSON.parse(readFileSync(constants.records.contenthash, 'utf-8'))
                         _contenthash.data = helper.encodeValue("contenthash", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
                         _contenthash.signer = _verify.signer
+                        _contenthash.payload = payload.contenthash
                         _contenthash.signature = signature_contenthash
                         _contenthash.approved = true
                         _contenthash.approval = verifier.approvalSig
@@ -461,7 +464,12 @@ export async function sign() {
         welcome,
         verified
     )
-    const validated = await getStatus(detectedUser, welcome)
+    const payload = {
+        addr60: payload_addr60,
+        avatar: payload_avatar,
+        contenthash: payload_contenthash
+    }
+    const validated = await getStatus(detectedUser, welcome, payload)
     await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll .well-known index.htm* records*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run view\'`
