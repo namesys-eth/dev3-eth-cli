@@ -2,21 +2,21 @@
 
 # About
 
-`dev3.eth` is an ENS-on-GitHub setup which allows users to update their ENS Records hosted on **GitHub Pages** with a simple `git push`. Users of `dev3.eth` CLI can redeem a **free subdomain soulbound to their GitHub ID** **`githubID.dev3.eth`**. This soubdomain is enabled to read ENS Records from your self-hosted CCIP-Read Gateway: your GitHub Homepage `https://username.github.io`. Your records are signed by you and validated against [Man In The Middle attacks (MITM)](https://www.imperva.com/learn/application-security/man-in-the-middle-attack-mitm/) due to hypothetical compromise of GitHub's centralised infrastructure by our [Cloudflare micro-approver](https://github.com/namesys-eth/dev3-eth-approver).  
+`dev3.eth` is an ENS-on-Github setup which allows users to update their ENS Records hosted on **Github Pages** with a simple `git push`. Users of `dev3.eth` CLI can redeem a **free subdomain soulbound to their Github ID** **`<id>.dev3.eth`**. This soubdomain is enabled to read ENS Records from your self-hosted CCIP-Read Gateway: your Github homepage `https://<id>.github.io`. Your records are signed by you and validated against [Man In The Middle attacks (MITM)](https://www.imperva.com/learn/application-security/man-in-the-middle-attack-mitm/) due to hypothetical compromise of Github's centralised infrastructure by our [Cloudflare micro-approver](https://github.com/namesys-eth/dev3-eth-approver).  
 
 ![](https://raw.githubusercontent.com/namesys-eth/dev3-eth-resources/main/graphics/png/fullStack.png)
 
 # Pre-requisites
 
-- `dev3.eth` feeds on your **GitHub Pages** for ENS Records. You must have your **GitHub Homepage** `https://githubID.github.io` configured to publish from `githubID.github.io` repository by default. Simple guide to doing this is [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
+- `dev3.eth` feeds on your **Github Pages** for ENS Records. You must have your **Github Homepage** `https://<id>.github.io` configured to publish from `<id>.github.io` repository by default. Simple guide to doing this is [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
 
-  > If you are using a custom GitHub Action or Workflow rendering your homepage from another repository, that is also fine as long as you know the basics of Git
+  > If you are using a custom Github Action or Workflow rendering your homepage from another repository, that is also fine as long as you know the basics of Git
 
-- It is advisable to have your GitHub Homepage auto-deploy upon push. This is default for `githubID.github.io` repository and **you don't need to do anything** in this case
+- It is advisable to have your Github Homepage auto-deploy upon push. This is default for `<id>.github.io` repository and **you don't need to do anything** in this case
 
   > For custom respository, please ensure that your Workflow has auto-deploy enabled upon push for best experience
 
-- Have access to your `githubID.github.io` or custom repository linked to GitHub Pages. Duh!
+- Have access to your `<id>.github.io` or custom repository linked to Github Pages. Duh!
 
 &nbsp;
 # Claiming your `dev3.eth` Subdomain!
@@ -27,15 +27,15 @@ Claiming a subdomain is three simple steps: Install, Initialise and Sign. The **
 
 ### STEP 1
 
-`cd` into your `githubID.github.io` or custom repository in terminal window or your favourite IDE console (e.g. VS Code) with:
+`cd` into your `<id>.github.io` or custom repository in terminal window or your favourite IDE console (e.g. VS Code) with:
 
 ```bash
-cd githubID.github.io
+cd <id>.github.io
 ```
 
 ### STEP 2
 
-Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom repository, or **globally** for better accessibility. That's it! You are now ready to redeem your free `dev3.eth` subdomain!
+Install `dev3-eth` CLI **locally** in your `<id>.github.io` or custom repository, or **globally** for better accessibility. That's it! You are now ready to redeem your free `dev3.eth` subdomain!
 
 | Context  | Install | Initialise | Publish | Status  |
 |:--------:|:-------:|:----------:|:-------:|:-------:|
