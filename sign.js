@@ -96,7 +96,7 @@ export async function sign() {
                             resolve(await write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar)) // Recursive call
                         }
                     } else {
-                        _contenthash_[0].value = constants.htmlContent
+                        _contenthash_[0].value = constants.defaultContenthash
                         resolve([true, _contenthash_])
                     }
                 })

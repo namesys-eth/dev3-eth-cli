@@ -62,7 +62,7 @@ export async function view() {
             }
             try { // Get contenthash
                 const contenthash = await resolver.getContentHash()
-                graphics.print(`  CONTENTHASH: ${contenthash} [3] ${contenthash === constants.htmlContent ? '[default]' : ''}`, "lightgreen")
+                graphics.print(`  CONTENTHASH: ${contenthash} [3] ${contenthash === constants.defaultContenthash ? '[default]' : ''}`, "lightgreen")
             } catch (error) {
                 graphics.print(`  CONTENTHASH: ... [3]`, "yellow")
                 _error.contenthash = error
