@@ -2,7 +2,7 @@
 
 # About
 
-`dev3.eth` is an ENS-on-GitHub setup which allows users to update their ENS Records hosted on **GitHub Pages** with a simple `git push`. Users of `dev3.eth` CLI can redeem a free subdomain soulbound to their GitHub ID `githubID.dev3.eth`. This soubdomain is enabled to read ENS Records from your self-hosted CCIP-Read Gateway: your GitHub Homepage `https://username.github.io`. Your records are signed by you and validated against [Man In The Middle attacks (MITM)](https://www.imperva.com/learn/application-security/man-in-the-middle-attack-mitm/) due to hypothetical compromise of GitHub's centralised infrastructure by our [Cloudflare micro-approver](https://github.com/namesys-eth/dev3-eth-approver).  
+`dev3.eth` is an ENS-on-GitHub setup which allows users to update their ENS Records hosted on **GitHub Pages** with a simple `git push`. Users of `dev3.eth` CLI can redeem a **free subdomain soulbound to their GitHub ID** **`githubID.dev3.eth`**. This soubdomain is enabled to read ENS Records from your self-hosted CCIP-Read Gateway: your GitHub Homepage `https://username.github.io`. Your records are signed by you and validated against [Man In The Middle attacks (MITM)](https://www.imperva.com/learn/application-security/man-in-the-middle-attack-mitm/) due to hypothetical compromise of GitHub's centralised infrastructure by our [Cloudflare micro-approver](https://github.com/namesys-eth/dev3-eth-approver).  
 
 ![](https://raw.githubusercontent.com/namesys-eth/dev3-eth-resources/main/graphics/png/fullStack.png)
 
@@ -18,7 +18,12 @@
 
 - Have access to your `githubID.github.io` or custom repository linked to GitHub Pages. Duh!
 
-# `dev3.eth`
+&nbsp;
+# Claiming your `dev3.eth` Subdomain!
+
+Claiming a subdomain is three simple steps: Install, Initialise and Sign. The **`install`** step installs the `dev3-eth` client. **`init`** step sets up the environment for publishing ENS records. **`sign`** step signs your records against any kind of tampering (e.g. by Github). 
+
+👇 Details are below in short form and then in long form after that! 
 
 ### STEP 1
 
@@ -44,11 +49,17 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 ```bash
 VERSION=0.3.3-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
-
----
+&nbsp;
 &nbsp;
 
-# `GLOBAL` Installation
+---
+
+&nbsp;
+&nbsp;
+
+## `GLOBAL` Installation
+
+`dev3-eth` client can be installed **globally** for quick access with `npx` 👇
 
 ### Install Package
 
@@ -74,9 +85,11 @@ npx dev3-eth sign
 npx dev3-eth view
 ```
 
-# OR
+### OR
 
-# `LOCAL` Installation
+## `LOCAL` Installation
+
+Some users may instead prefer to install the `dev3-eth` client locally for security reasons. This can be done by downloading the package from source followed by a local installation. Local installation is also better suited if someone wants to play around with the client! 👇
 
 ### Install Package
 
