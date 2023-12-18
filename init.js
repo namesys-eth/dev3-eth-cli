@@ -50,12 +50,17 @@ export async function init() {
         output: process.stdout,
     })
 
+    // HISTORY
+    const history = await helper.history()
+
     // WELCOME!
     console.log()
     graphics.print(graphics.asciiArt, 'orange')
     graphics.logo()
     graphics.print(graphics.initAsciiArt, 'orange')
     console.log()
+    graphics.print(`💎 ${history} subdomains minted so far!`, 'lightgreen')
+    graphics.print(`🧪 (Re-)initialising your subdomain...`, 'skyblue')
 
     // Check Git Repository
     const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
@@ -71,8 +76,9 @@ export async function init() {
     const configured = await setKeypair(keypair)
 
     // Push to Github
-    await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
+    let success = await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll records.json index.htm*',
-        `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run sign\'`
+        `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npx dev3-eth sign\' OR \'npm run sign\'`
     )
+    if (!success) rl.close()
 }

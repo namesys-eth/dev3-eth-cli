@@ -385,6 +385,7 @@ export async function sign() {
         input: process.stdin,
         output: process.stdout,
     })
+
     // WELCOME!
     console.log()
     graphics.print(graphics.asciiArt, 'orange')
@@ -470,8 +471,9 @@ export async function sign() {
         contenthash: payload_contenthash
     }
     const validated = await getStatus(detectedUser, welcome, payload)
-    await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
+    let success = await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll .well-known index.htm* records*',
-        `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npm run view\'`
+        `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npx dev3-eth view\' OR \'npm run view\'`
     )
+    if (!success) rl.close()
 }

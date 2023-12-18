@@ -26,11 +26,12 @@ const atomRegex = /^cosmos1[a-zA-Z0-9]{38}$/
 const validator = 'https://dev3.namesys.xyz/verify/'
 const signedRecord = 'function signedRecord(address recordSigner, bytes memory recordSignature, bytes memory approvedSignature, bytes memory result)'
 const resolver = '0x83c25DbcFD8d79a9E0F9f7f6cFc5b21716ACf469'
-const approver = '0x8fd379246834eac74B8419FfdA202CF8051F7A03'
+const approver = '0xae9Cc8813ab095cD38F3a8d09Aecd66b2B2a2d35'
 const ALCHEMY_KEY_DEFAULT = 'UaFrPLamMm7GQFPc2-XRadQq7jU7uP9R'
 const NETWORK = 'goerli'
 const record = 'records.json'
 const verify = 'verify.json'
+const history = 'https://dev3.namesys.xyz/count'
 const records = {
   addr60: 'records/address/60.json',
   avatar: 'records/text/avatar.json',
@@ -99,6 +100,7 @@ export default {
   recordContent,
   recordsContent,
   approver,
+  history,
   ALCHEMY_KEY_DEFAULT,
   NETWORK
 }

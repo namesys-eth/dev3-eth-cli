@@ -14,6 +14,22 @@ require('dotenv').config()
 
 const SIGNER = process.env.SIGNER
 
+// History
+async function history() {
+  return new Promise(async (resolve) => {
+    try {
+      const response = await fetch(constants.history)
+      if (!response.ok) {
+        resolve(false)
+      }
+      const data = await response.json()
+      resolve(data.total)
+    } catch (error) {
+      resolve(null)
+    }
+  })
+}
+
 // Creates a deep file
 async function createDeepFile(filePath) {
   try {
@@ -96,13 +112,14 @@ async function getGitRepo() {
         usernameMatch[1],
         branch,
         signingKey,
-        repoName
+        repoName,
+        existsSync('CNAME') || false
       ]
     } else {
-      return [null, null, null, null]
+      return [null, null, null, null, null]
     }
   } catch (error) {
-    return [null, null, null, null]
+    return [null, null, null, null, null]
   }
 }
 
@@ -111,7 +128,7 @@ function validateGitRepo(rl) {
   return new Promise(async (resolve) => {
     const _isGitRepo = isGitRepo()
     if (_isGitRepo) {
-      const [_username, _branch, _githubKey, _repoName] = await getGitRepo()
+      const [_username, _branch, _githubKey, _repoName, _cname] = await getGitRepo()
       if (_repoName.toLowerCase() === `${_username}.github.io`) {
         graphics.print(`✅ Valid git repository: ${_repoName.toLowerCase()}`, "lightgreen")
         graphics.print(`👉 Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from default repository \'${_repoName.toLowerCase()}\'`, "yellow")
@@ -274,22 +291,29 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
       } else {
         graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       }
-      rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
-        if (!attempt || attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
-          const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
-          resolve(_pushed)
-          graphics.print(message, "lightgreen")
-          graphics.print(`👋 BYEE!`, "lightgreen")
-          rl.close()
-        } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
-          graphics.print(`👋 OK, BYEE!`, "lightgreen")
-          rl.close()
-          resolve(false)
-        } else {
-          graphics.print('⛔ Bad Input', "orange")
-          resolve(await gitCommitPush(validated, branch, githubKey, detectedUser, rl, files, message)) // Recursive call
-        }
-      })
+      const statusOutput = execSync('git status --porcelain').toString().trim()
+      if (statusOutput !== '') {
+        graphics.print('❗ There are other unadded files in the repository. Please add and commit them manually before proceeding', "orange")
+        graphics.print('❌ Quitting...', "orange")
+        resolve(false)
+      } else {
+        rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
+          if (!attempt || attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
+            const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
+            resolve(_pushed)
+            graphics.print(message, "lightgreen")
+            graphics.print(`👋 BYEE!`, "lightgreen")
+            rl.close()
+          } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
+            graphics.print(`👋 OK, BYEE!`, "lightgreen")
+            rl.close()
+            resolve(false)
+          } else {
+            graphics.print('⛔ Bad Input', "orange")
+            resolve(await gitCommitPush(validated, branch, githubKey, detectedUser, rl, files, message)) // Recursive call
+          }
+        })
+      }
     })
   } else {
     return new Promise(async (resolve) => {
@@ -480,5 +504,6 @@ export default {
   encodeValue,
   genExtradata,
   payloadRecord,
-  payloadCloudflare
+  payloadCloudflare,
+  history
 }
