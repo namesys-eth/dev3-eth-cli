@@ -119,7 +119,7 @@ export async function sign() {
                     // Read from buffer
                     addr60[0].value = _buffer.records.address.eth
                     avatar[0].value = _buffer.records.text.avatar
-                    contenthash[0].value = _buffer.records.contenthash
+                    contenthash[0].value = !_buffer.records.contenthash || _buffer.records.contenthash === null ? constants.defaultContenthash : _buffer.records.contenthash
                     // addr60
                     if (_buffer.records.address.eth) {
                         const _file = await helper.createDeepFile(constants.records.addr60)
@@ -140,6 +140,14 @@ export async function sign() {
                     }
                     // contenthash
                     if (_buffer.records.contenthash) {
+                        const _file = await helper.createDeepFile(constants.records.contenthash)
+                        if (_file) {
+                            writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
+                        } else {
+                            resolve(false)
+                        }
+                    }
+                    if (!_buffer.records.contenthash || _buffer.records.contenthash === null ) {
                         const _file = await helper.createDeepFile(constants.records.contenthash)
                         if (_file) {
                             writeFileSync(constants.records.contenthash, JSON.stringify(contenthash[0], null, 2))
@@ -210,7 +218,7 @@ export async function sign() {
                     let records = JSON.parse(readFileSync(constants.record, 'utf-8'))
                     __addr60.value = records.records.address.eth || null
                     __avatar.value = records.records.text.avatar || null
-                    __contenthash.value = records.records.contenthash || null
+                    __contenthash.value = records.records.contenthash || constants.defaultContenthash
                 }
                 // validity flags
                 var flag = {
@@ -340,7 +348,7 @@ export async function sign() {
                         writeFileSync(constants.records.avatar, JSON.stringify(_avatar, null, 2))
                     }
                     // contenthash
-                    if (_buffer.records.contenthash) {
+                    if (_buffer.records.contenthash || constants.defaultContenthash) {
                         let _contenthash = JSON.parse(readFileSync(constants.records.contenthash, 'utf-8'))
                         _contenthash.data = helper.encodeValue("contenthash", _contenthash.value, _verify.signer, signature_contenthash, verifier.approvalSig)
                         _contenthash.signer = _verify.signer
@@ -458,7 +466,7 @@ export async function sign() {
         detectedUser,
         JSON.parse(
             readFileSync(constants.record, 'utf-8')
-        ).records.contenthash,
+        ).records.contenthash || constants.defaultContenthash,
         'contenthash',
         'contenthash',
         constants.resolver,

@@ -69,7 +69,7 @@ const htmlContent = `
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>dev3.eth</title><style>@font-face{font-family:'SF';src:url('https://namesys-eth.github.io/SF.woff2')format('woff2');}body{font-family:"SF";background-color:black;color:white;margin:20px 0 0 0px;display:flex;flex-direction:column;align-items:center;justify-content:center;}h1{font-size:34px;margin:20px 0 0 0px;color:#fc4103;}p{margin:5px 0 0 0px;font-size:28px;color:#a3a3a3;}pre{margin:5px 0 0 0px;font-family:"SF";color:white;}span{color:white;}img{margin:30px 0 0 0;}</style></head><body><script>async function c(){let p;let h=window.location.hostname;document.title=\`\${h}\`;try{let r=await fetch(\`https://\${h.split('.')[0]}.github.io/records.json\`);let d=await r.json();let _r=await fetch(\`https://dev3.namesys.xyz/view/\${h.split('.')[0]}\`);let _d=await _r.json();p=\`<img src="https://namesys-eth.github.io/logo.png" height="150px"/><img src="\${d.records.text.avatar}" height="100px"/><h1><span>\${d.githubid}</span>.dev3.eth</h1><p>ADDRESS: <pre>\${d.records.address.eth}</pre></p><p>AVATAR: <pre>\${d.records.text.avatar}</pre></p><p>SIGNER: <pre>\${d.signer}</pre></p><p>REGISTERED ON: <pre>\${new Date(_d.value.timestamp)}</pre></p><p>RANK: <pre>\${_d.value.index}</pre></p>\`; } catch { p=\`<p>Error 404</p>\`; } document.body.innerHTML=p;}c();</script></body></html>
 `
 
-const defaultContenthash = 'ipfs://QmSq8nvro3qVB5KmwRxGrhxij75t3thvLjX7eGVSzYuZw'
+const defaultContenthash = 'ipfs://QmSq8nvro3qVB5KmwRxGrhxij75t3thvLjX7eGVSzYuZw1'
 
 export default {
   githubIDRegex,
