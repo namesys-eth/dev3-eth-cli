@@ -6,7 +6,7 @@
 
 ![](https://raw.githubusercontent.com/namesys-eth/dev3-eth-resources/main/graphics/png/fullStack.png)
 
-# Prerequisites
+# Pre-requisites
 
 - `dev3.eth` feeds on your **GitHub Pages** for ENS Records. You must have your **GitHub Homepage** `https://githubID.github.io` configured to publish from `githubID.github.io` repository by default. Simple guide to doing this is [here](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
 
@@ -47,7 +47,7 @@ Install `dev3-eth` CLI **locally** in your `githubID.github.io` or custom reposi
 ### `[1]`
 
 ```bash
-VERSION=0.3.5-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.0.1-beta && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 &nbsp;
 &nbsp;
@@ -94,7 +94,7 @@ Some users may instead prefer to install the `dev3-eth` client locally for secur
 ### Install Package
 
 ```bash
-VERSION=0.3.5-alpha && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
+VERSION=0.0.1-beta && curl -LO https://namesys-eth.github.io/install.sh && source install.sh
 ```
 
 ### Initialise `sub.dev3.eth` 

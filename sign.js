@@ -96,7 +96,7 @@ export async function sign() {
                             resolve(await write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar)) // Recursive call
                         }
                     } else {
-                        _contenthash_[0].value = null
+                        _contenthash_[0].value = constants.htmlContent
                         resolve([true, _contenthash_])
                     }
                 })
@@ -272,7 +272,7 @@ export async function sign() {
                     graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
                     const _signed = helper.signRecord(
                         `https://${detectedUser}.github.io`,
-                        '5',
+                        constants.NETWORK === 'mainnet' ? '1' : '5',
                         resolver,
                         type,
                         helper.genExtradata(key, record),
