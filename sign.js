@@ -394,7 +394,7 @@ export async function sign() {
     console.log()
 
     // Check Git Repository
-    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
+    const [isGitRepo, detectedUser, branch, githubKey, synced, status] = await helper.validateGitRepo(rl)
     let userDetected = undefined
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
@@ -471,7 +471,7 @@ export async function sign() {
         contenthash: payload_contenthash
     }
     const validated = await getStatus(detectedUser, welcome, payload)
-    let success = await helper.gitCommitPush(validated, branch, githubKey, detectedUser, rl,
+    let success = await helper.gitCommitPush(status, validated, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll .well-known index.htm* records*',
         `🎉 Successfully updated ENS Records with dev3.eth! To check your signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npx dev3-eth view\' OR \'npm run view\'`
     )

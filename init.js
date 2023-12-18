@@ -63,7 +63,7 @@ export async function init() {
     graphics.print(`🧪 (Re-)initialising your subdomain...`, 'skyblue')
 
     // Check Git Repository
-    const [isGitRepo, detectedUser, branch, githubKey, synced] = await helper.validateGitRepo(rl)
+    const [isGitRepo, detectedUser, branch, githubKey, synced, status] = await helper.validateGitRepo(rl)
     let userDetected = undefined
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
@@ -76,7 +76,7 @@ export async function init() {
     const configured = await setKeypair(keypair)
 
     // Push to Github
-    let success = await helper.gitCommitPush(configured, branch, githubKey, detectedUser, rl,
+    let success = await helper.gitCommitPush(status, configured, branch, githubKey, detectedUser, rl,
         'verify.json .gitignore .nojekyll records.json index.htm*',
         `🎉 Successfully configured ENS-on-Github with dev3.eth! To set signed ENS Records for \'${detectedUser}.dev3.eth\', try \'npx dev3-eth sign\' OR \'npm run sign\'`
     )

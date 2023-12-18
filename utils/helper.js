@@ -139,13 +139,15 @@ function validateGitRepo(rl) {
       }
       const _synced = !await isRemoteSynced(_branch)
       if (_synced) {
+        const _status = execSync('git status --porcelain').toString().trim()
         graphics.print('✅ Remote tip is in sync', "lightgreen")
         resolve([
           _isGitRepo,
           _username,
           _branch,
           _githubKey,
-          _synced
+          _synced,
+          _status
         ])
       } else {
         graphics.print(`❗ Cannot proceed further! Remote branch is out of sync with local. please \'git push\' or \'git pull\' to sync with remote tip and then try again`, "orange")
@@ -153,6 +155,7 @@ function validateGitRepo(rl) {
         rl.close()
         resolve([
           _isGitRepo,
+          null,
           null,
           null,
           null,
@@ -280,7 +283,7 @@ async function sendToRemote(branch, timestamp, githubKey, files) {
 }
 
 // Try Git Commit & Push
-async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, files, message) {
+async function gitCommitPush(status, validated, branch, githubKey, detectedUser, rl, files, message) {
   if (validated) {
     return new Promise(async (resolve) => {
       const timestamp = Date.now()
@@ -291,8 +294,7 @@ async function gitCommitPush(validated, branch, githubKey, detectedUser, rl, fil
       } else {
         graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       }
-      const statusOutput = execSync('git status --porcelain').toString().trim()
-      if (statusOutput !== '') {
+      if (status !== '') {
         graphics.print('❗ There are other unadded files in the repository. Please add and commit them manually before proceeding', "orange")
         graphics.print('❌ Quitting...', "orange")
         resolve(false)
