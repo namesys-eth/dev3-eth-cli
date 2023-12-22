@@ -17,10 +17,11 @@ if (args[0] === "init") {
     graphics.print(graphics.asciiArt, 'orange')
     graphics.logo()
     console.log()
-    graphics.print("👉 Please run 'npx dev3-eth init' (global install) or 'npm run init' (local install) to initialise", "skyblue")
-    graphics.print("👉 Please run 'npx dev3-eth sign' (global install) or 'npm run sign' (local install) to sign & publish your ENS records", "skyblue")
-    graphics.print("👉 Please run 'npx dev3-eth view' (global install) or 'npm run view' (local install) to view your ENS records", "skyblue")
-    graphics.print(" ◥ docs: https://dev3.eth.limo", "skyblue")
+    graphics.print(" ○ @namesys-eth/dev3-eth: v0.0.4-beta", "skyblue")
+    graphics.print(" ▲ Please run 'npx dev3-eth init' (global install) or 'npm run init' (local install) to initialise", "skyblue")
+    graphics.print(" ▲ Please run 'npx dev3-eth sign' (global install) or 'npm run sign' (local install) to sign & publish your ENS records", "skyblue")
+    graphics.print(" ▲ Please run 'npx dev3-eth view' (global install) or 'npm run view' (local install) to view your ENS records", "skyblue")
+    graphics.print(" ◥ docs: https://dev3.eth.limo", "yellow")
 }
 
 // Determine which function to run based on the command-line argument

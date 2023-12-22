@@ -17,11 +17,11 @@ export async function view() {
     // Confirm Github ID
     async function confirm(rl) {
         return new Promise(async (resolve) => {
-            rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
+            rl.question(' ▶ Please enter your Github ID: ', async (githubID) => {
                 if (helper.isValidGithubID(githubID)) {
                     resolve(githubID)
                 } else {
-                    graphics.print('⛔ Bad Input', "orange")
+                    graphics.print(' ● Bad Input', "orange")
                     resolve(null)
                 }
             })
@@ -32,7 +32,7 @@ export async function view() {
     async function show(githubID, provider) {
         if (helper.isValidGithubID(githubID)) {
             let domain = `${githubID}.dev3.eth`
-            graphics.print(`🔎 Searching...`, 'skyblue')
+            graphics.print(` ▢ Searching...`, 'skyblue')
             graphics.print(`${space}  DOMAIN: ${domain}`, "white")
             let resolver
             let _error = {
@@ -70,7 +70,7 @@ export async function view() {
             console.log()
             return _error
         } else {
-            graphics.print(`❌ Bad Github ID! Quitting...`, "orange")
+            graphics.print(` ⨯ Bad Github ID! Quitting...`, "orange")
             return null
         }
     }
@@ -80,7 +80,7 @@ export async function view() {
         return new Promise(async (resolve) => {
             if (username) {
                 let _error
-                rl.question(`⏰ Detected Github ID: ${username}. Confirm? [Y/N]: `, async (agree) => {
+                rl.question(` ▶ Detected Github ID: ${username}. Confirm? [Y/N]: `, async (agree) => {
                     if (!agree || agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
                         _error = await show(username, provider)
                         resolve(_error)
@@ -93,7 +93,7 @@ export async function view() {
                             await status(username, provider, rl) // Recursive call
                         }
                     } else {
-                        graphics.print('⛔ Bad Input', "orange")
+                        graphics.print(' ● Bad Input', "orange")
                         await status(username, provider, rl) // Recursive call
                     }
                 })
@@ -113,47 +113,47 @@ export async function view() {
     // Debugs ENS Records
     async function debug(rl, username, error) {
         return new Promise(async (resolve) => {
-            rl.question('🚧 Debug ENS Records? [Y/N]: ', async (_debug) => {
+            rl.question(' ● Debug ENS Records? [Y/N]: ', async (_debug) => {
                 if (!_debug || _debug.toLowerCase() === 'y' || _debug.toLowerCase() === 'yes') {
-                    graphics.print('🔎 Verifying Records...', "skyblue")
+                    graphics.print(' ▢ Verifying Records...', "skyblue")
                     await verifyRecords(username, _debug)
                     let _url = `https://${username}.github.io/records.json`
                     let response = await fetch(_url)
                     let signer
                     let approval
                     if (!response.ok) {
-                        graphics.print(`❗ [Fetch] Failed to fetch records file \'records.json\': error ${response.status}`, "orange")
+                        graphics.print(` ■ [Fetch] Failed to fetch records file \'records.json\': error ${response.status}`, "orange")
                         resolve(await debug(rl, username, error))
                     } else {
-                        graphics.print(`⬇️  [Fetch] Fetching records file: \'records.json\'`, "cyan")
+                        graphics.print(` ▼ [Fetch] Fetching records file: \'records.json\'`, "cyan")
                         const data = await response.json()
                         signer = data.signer
                         approval = data.approval
                     }
                     await verifyCloudflare(username, signer, approval, constants.approver)
-                    rl.question('🚧 Enter [index] of record to debug? (enter index [1/2/3/N]): ', async (_index) => {
+                    rl.question(' ● Enter [index] of record to debug? (enter index [1/2/3/N]): ', async (_index) => {
                         if (['1', '2', '3'].includes(_index)) {
                             let key
                             if (_index === '1') key = 'addr60'
                             if (_index === '2') key = 'avatar'
                             if (_index === '3') key = 'contenthash'
-                            console.log('❗ [`LOG]: ', error[key])
+                            console.log(' ■ [LOG]: ', error[key])
                             resolve([_index, signer])
                         } else if (_index.toLowerCase() === 'n' || _index.toLowerCase() === 'no') {
-                            graphics.print(`👋 OK, BYEE!`, "lightgreen")
+                            graphics.print(` ▲ OK, BYEE!`, "lightgreen")
                             resolve([null, signer])
                             rl.close()
                         } else {
-                            graphics.print('⛔ Bad Input', "orange")
+                            graphics.print(' ● Bad Input', "orange")
                             resolve(await debug(rl, username, error))
                         }
                     })
                 } else if (_debug.toLowerCase() === 'n' || _debug.toLowerCase() === 'no') {
-                    graphics.print(`👋 OK, BYEE!`, "lightgreen")
+                    graphics.print(` ▲ OK, BYEE!`, "lightgreen")
                     resolve([null, null])
                     rl.close()
                 } else {
-                    graphics.print('⛔ Bad Input', "orange")
+                    graphics.print(' ● Bad Input', "orange")
                     resolve(await debug(rl, username, error))
                 }
             })
@@ -186,16 +186,16 @@ export async function view() {
                 if (i === 2) test = __contenthash.now || null
                 if (!response.ok && test === null) {
                     if (test === null) {
-                        graphics.print(`⬇️  [Fetch] Skipping record file: ${keys[i]} [${i + 1}]`, "cyan")
+                        graphics.print(` ▼ [Fetch] Skipping record file: ${keys[i]} [${i + 1}]`, "cyan")
                     } else {
-                        graphics.print(`❗ [Fetch] Failed to fetch record file ${keys[i]}: error ${response.status} [${i + 1}]`, "red")
+                        graphics.print(` ■ [Fetch] Failed to fetch record file ${keys[i]}: error ${response.status} [${i + 1}]`, "red")
                     }
                 } else {
                     const data = await response.json()
                     if (i === 0) __addr60.value = data.value || null
                     if (i === 1) __avatar.value = data.value || null
                     if (i === 2) __contenthash.value = data.value || null
-                    graphics.print(`⬇️  [Fetch] Fetching record file: ${keys[i]} [${i + 1}]`, "cyan")
+                    graphics.print(` ▼ [Fetch] Fetching record file: ${keys[i]} [${i + 1}]`, "cyan")
                 }
             }
             // validity flags
@@ -207,39 +207,39 @@ export async function view() {
             // addr60
             if (__addr60.value && __addr60.value !== null && helper.isAddr(__addr60.value)) { // strip '0x'
                 flag.addr60 = true
-                graphics.print(`🧪 Verified record file: address/60.json [1]`, "skyblue")
+                graphics.print(` ○ Verified record file: address/60.json [1]`, "skyblue")
             } else if (!__addr60.value || __addr60.value === null) {
                 flag.addr60 = true
-                graphics.print('🧪 Empty \'addr60:\' value in \'records.json\' [1]', "skyblue")
+                graphics.print(' ○ Empty \'addr60:\' value in \'records.json\' [1]', "skyblue")
             } else {
-                graphics.print('❗ Bad \'addr60:\' value in \'records.json\' [1]', "orange")
+                graphics.print(' ■ Bad \'addr60:\' value in \'records.json\' [1]', "orange")
             }
             // avatar
             if (__avatar.value && __avatar.value !== null && helper.isURL(__avatar.value)) {
                 flag.avatar = true
-                graphics.print(`🧪 Verified record file: text/avatar.json [2]`, "skyblue")
+                graphics.print(` ○ Verified record file: text/avatar.json [2]`, "skyblue")
             } else if (!__avatar.value || __avatar.value === null) {
                 flag.avatar = true
-                graphics.print('🧪 Empty \'avatar:\' value in \'records.json\' [2]', "skyblue")
+                graphics.print(' ○ Empty \'avatar:\' value in \'records.json\' [2]', "skyblue")
             } else {
-                graphics.print('❗ Bad \'avatar:\' value in \'records.json\' [2]', "orange")
+                graphics.print(' ■ Bad \'avatar:\' value in \'records.json\' [2]', "orange")
             }
             // contenthash
             if (__contenthash.value && __contenthash.value !== null && helper.isContenthash(__contenthash.value)) {
                 flag.contenthash = true
-                graphics.print(`🧪 Verified record file: contenthash.json [3]`, "skyblue")
+                graphics.print(` ○ Verified record file: contenthash.json [3]`, "skyblue")
             } else if (!__contenthash.value || __contenthash.value === null) {
                 flag.contenthash = true
-                graphics.print('🧪 Empty \'contenthash:\' value in \'records.json\' [3]', "skyblue")
+                graphics.print(' ○ Empty \'contenthash:\' value in \'records.json\' [3]', "skyblue")
             } else {
-                graphics.print('❗ Bad \'contenthash:\' value in \'records.json\' [3]', "orange")
+                graphics.print(' ■ Bad \'contenthash:\' value in \'records.json\' [3]', "orange")
             }
             /* add more ENS Records here */
             if (Object.values(flag).every(value => value === true)) {
-                graphics.print(`✅ Records verified!`, "lightgreen")
+                graphics.print(` ✓ Records verified!`, "lightgreen")
                 resolve(true)
             } else {
-                graphics.print(`❗ Records failed verification!`, "orange")
+                graphics.print(` ■ Records failed verification!`, "orange")
                 resolve(false)
             }
         })
@@ -267,7 +267,7 @@ export async function view() {
             let value
             let signature
             if (!response.ok) {
-                graphics.print(`❗ [Signature] Failed to fetch records file \'${type}.json\': error ${response.status}`, "orange")
+                graphics.print(` ■ [Signature] Failed to fetch records file \'${type}.json\': error ${response.status}`, "orange")
                 resolve(true)
             } else {
                 const data = await response.json()
@@ -283,10 +283,10 @@ export async function view() {
                 )
                 const _signer = ethers.verifyMessage(payload, signature)
                 if (_signer === signer) {
-                    graphics.print(`✅ Verified Signature for: ${type}`, "lightgreen")
+                    graphics.print(` ✓ Verified Signature for: ${type}`, "lightgreen")
                     resolve(true)
                 } else {
-                    graphics.print(`❗ Bad \'signature:\' in \'${type}.json\'`, "orange")
+                    graphics.print(` ■ Bad \'signature:\' in \'${type}.json\'`, "orange")
                     resolve(true)
                 }
             }
@@ -303,9 +303,9 @@ export async function view() {
         )
         const _signer = ethers.verifyMessage(payload, approval)
         if (_signer === approver) {
-            graphics.print(`✅ Verified Cloudflare Validation`, "lightgreen")
+            graphics.print(` ✓ Verified Cloudflare Validation`, "lightgreen")
         } else {
-            graphics.print(`❗ Bad Cloudflare Signature`, "orange")
+            graphics.print(` ■ Bad Cloudflare Signature`, "orange")
         }
     }
 
@@ -342,10 +342,10 @@ export async function view() {
         if (_debug && _debug !== null) {
             const trigger = await verifySignature(username, Number(_debug), signer);
             if (!trigger) {
-                graphics.print(`🤞 HOPE IT HELPED!`, "lightgreen")
+                graphics.print(` ▲ HOPE IT HELPED!`, "lightgreen")
                 rl.close()
             } else {
-                graphics.print('🧪 Continuing de-bugger...', "skyblue")
+                graphics.print(' ○ Continuing de-bugger...', "skyblue")
                 await verifyAndDebug()
             }
         }

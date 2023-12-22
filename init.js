@@ -13,19 +13,19 @@ export async function init() {
     async function getSigner() {
         if (welcome && synced) {
             return new Promise((resolve) => {
-                rl.question('⏰ Enter Signing key (optional; leaving this field empty will generate a new Signing key): ', async (_signerKey) => {
+                rl.question(' ▶ Enter Signing key (optional; leaving this field empty will generate a new Signing key): ', async (_signerKey) => {
                     const signerKey = _signerKey.startsWith('0x') ? _signerKey.slice(2) : _signerKey
                     if (helper.isValidSigner(signerKey)) {
-                        graphics.print(`✅ Valid Signer key`, "lightgreen")
+                        graphics.print(` ✓ Valid Signer key`, "lightgreen")
                         const _keypair = keygen.PUBKEY(signerKey)
                         resolve(_keypair) // Resolve the promise
                     } else if (!signerKey) {
-                        graphics.print(`🧪 Generating new Signer key...`, "skyblue")
+                        graphics.print(` ○ Generating new Signer key...`, "skyblue")
                         const _keypair = await keygen.KEYGEN()
-                        graphics.print(`✅ Successfully generated new Signer Key!`, "lightgreen")
+                        graphics.print(` ✓ Successfully generated new Signer Key!`, "lightgreen")
                         resolve(_keypair) // Resolve the promise
                     } else {
-                        graphics.print('❌ Invalid Signer key! Please try again OR press CTRL + C to exit', "orange")
+                        graphics.print(' ⨯ Invalid Signer key! Please try again OR press CTRL + C to exit', "orange")
                         resolve(await getSigner())
                     }
                 })
@@ -38,7 +38,7 @@ export async function init() {
         if (keypair) {
             return new Promise(async (resolve) => {
                 const _config = await helper.writeConfig(keypair)
-                graphics.print(`✅ Signer written to .env & verify.json, and validated .gitignore`, "lightgreen")
+                graphics.print(` ✓ Signer written to .env & verify.json, and validated .gitignore`, "lightgreen")
                 resolve(_config)
             })
         }
@@ -59,8 +59,8 @@ export async function init() {
     graphics.logo()
     graphics.print(graphics.initAsciiArt, 'orange')
     console.log()
-    graphics.print(`💎 ${history} subdomains minted so far!`, 'lightgreen')
-    graphics.print(`🧪 (Re-)initialising your subdomain...`, 'skyblue')
+    graphics.print(` ◆ ${history} subdomains minted so far!`, 'lightgreen')
+    graphics.print(` ○ (Re-)initialising your subdomain...`, 'skyblue')
 
     // Check Git Repository
     const [isGitRepo, detectedUser, branch, githubKey, synced, status] = await helper.validateGitRepo(rl)

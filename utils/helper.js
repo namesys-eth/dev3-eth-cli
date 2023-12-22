@@ -36,11 +36,11 @@ async function createDeepFile(filePath) {
     const directory = path.dirname(filePath)
     await fs.mkdir(directory, { recursive: true })
     await fs.writeFile(filePath, JSON.stringify(constants.recordContent, null, 2))
-    graphics.print(`🧪 Made record file: ${filePath}`, "skyblue")
+    graphics.print(` ○ Made record file: ${filePath}`, "skyblue")
     return true
   } catch (error) {
     console.log(error)
-    graphics.print(`❌ Error creating file: ${filePath}`, "orange")
+    graphics.print(` ⨯ Error creating file: ${filePath}`, "orange")
     return false
   }
 }
@@ -130,17 +130,17 @@ function validateGitRepo(rl) {
     if (_isGitRepo) {
       const [_username, _branch, _githubKey, _repoName, _cname] = await getGitRepo()
       if (_repoName.toLowerCase() === `${_username}.github.io`) {
-        graphics.print(`✅ Valid git repository: ${_repoName.toLowerCase()}`, "lightgreen")
-        graphics.print(`👉 Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from default repository \'${_repoName.toLowerCase()}\'`, "yellow")
+        graphics.print(` ✓ Valid git repository: ${_repoName.toLowerCase()}`, "lightgreen")
+        graphics.print(` ▲ Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from default repository \'${_repoName.toLowerCase()}\'`, "yellow")
       } else {
-        graphics.print(`🚧 Detected custom git repository: ${_repoName.toLowerCase()} (default: ${_username}.github.io)`, "yellow")
-        graphics.print(`👉 Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from custom repository \'${_repoName.toLowerCase()}\'. Otherwise, please deploy it manually from \'${_repoName.toLowerCase()}\' OR switch to default repository \'${_username}.github.io\'`, "yellow")
+        graphics.print(` ● Detected custom git repository: ${_repoName.toLowerCase()} (default: ${_username}.github.io)`, "yellow")
+        graphics.print(` ▲ Please ensure that Github Pages (https://${_username}.github.io/) is configured to auto-deploy upon push from custom repository \'${_repoName.toLowerCase()}\'. Otherwise, please deploy it manually from \'${_repoName.toLowerCase()}\' OR switch to default repository \'${_username}.github.io\'`, "yellow")
         graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
       }
       const _synced = !await isRemoteSynced(_branch)
       if (_synced) {
         const _status = execSync('git status --porcelain').toString().trim()
-        graphics.print('✅ Remote tip is in sync', "lightgreen")
+        graphics.print(' ✓ Remote tip is in sync', "lightgreen")
         resolve([
           _isGitRepo,
           _username,
@@ -150,8 +150,8 @@ function validateGitRepo(rl) {
           _status
         ])
       } else {
-        graphics.print(`❗ Cannot proceed further! Remote branch is out of sync with local. please \'git push\' or \'git pull\' to sync with remote tip and then try again`, "orange")
-        graphics.print(`❌ Please \'git merge\' or \'git pull\' to sync with remote tip and then try again. Quitting...`, "orange")
+        graphics.print(` ■ Cannot proceed further! Remote branch is out of sync with local. please \'git push\' or \'git pull\' to sync with remote tip and then try again`, "orange")
+        graphics.print(` ⨯ Please \'git merge\' or \'git pull\' to sync with remote tip and then try again. Quitting...`, "orange")
         rl.close()
         resolve([
           _isGitRepo,
@@ -163,11 +163,11 @@ function validateGitRepo(rl) {
         ])
       }
     } else {
-      graphics.print(`❌ Not a git repository! Please initialise and configure as git repository first. Quitting...`, "orange")
-      graphics.print(`❗ PRE-REQUISITES:`, "orange")
-      graphics.print(`👉 Please make sure that git repository is initialised and configured to push to remote branch on Github`, "orange")
+      graphics.print(` ⨯ Not a git repository! Please initialise and configure as git repository first. Quitting...`, "orange")
+      graphics.print(` ■ PRE-REQUISITES:`, "orange")
+      graphics.print(` ▲ Please make sure that git repository is initialised and configured to push to remote branch on Github`, "orange")
       graphics.print(` ◥ docs: https://docs.github.com/en/get-started/using-git/about-git#github-and-the-command-line`, "orange")
-      graphics.print(`👉 Please make sure that Github Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+      graphics.print(` ▲ Please make sure that Github Pages (https://<githubID>.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
       graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
       rl.close()
       resolve([
@@ -184,13 +184,13 @@ function validateGitRepo(rl) {
 // Request Github ID for login
 function requestGithubID(detectedUser, rl) {
   return new Promise((resolve) => {
-    rl.question(`⏰ Detected Github ID: ${detectedUser}. Confirm? [Y/N]: `, async (agree) => {
+    rl.question(` ▶ Detected Github ID: ${detectedUser}. Confirm? [Y/N]: `, async (agree) => {
       if (!agree || agree.toLowerCase() === 'y' || agree.toLowerCase() === 'yes') {
         resolve(true)
       } else if (agree.toLowerCase() === 'n' || agree.toLowerCase() === 'no') {
         resolve(false)
       } else {
-        graphics.print('⛔ Bad Input', "orange")
+        graphics.print(' ● Bad Input', "orange")
         resolve(await requestGithubID(detectedUser, rl)) // Recursive call
       }
     })
@@ -200,38 +200,38 @@ function requestGithubID(detectedUser, rl) {
 // Validates Github ID for login
 function validateGithubID(rl, suffix) {
   return new Promise((resolve) => {
-    rl.question('⏰ Please enter your Github ID: ', async (githubID) => {
+    rl.question(' ▶ Please enter your Github ID: ', async (githubID) => {
       if (isValidGithubID(githubID)) {
         const _githubIDExists = await githubIDExists(githubID)
         if (_githubIDExists) {
-          graphics.print(`👋 Welcome, ${githubID}!`, "yellow")
+          graphics.print(` ▲ Welcome, ${githubID}!`, "yellow")
           const _ghpages = await isGithubPagesConfigured(githubID, suffix)
           if (_ghpages) {
-            graphics.print(`✅ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
-            graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
+            graphics.print(` ✓ Github Page exists: https://${githubID}.github.io/`, "lightgreen")
+            graphics.print(` ▲ Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
             graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
             resolve(true) // Resolve the promise with true
           } else {
             if (!suffix) {
-              graphics.print(`🚧 Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "yellow")
-              graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
-              graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
+              graphics.print(` ● Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "yellow")
+              graphics.print(` ▲ Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+              graphics.print(` ◑ TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
               graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
               resolve(true) // Resolve the promise with true
             } else {
-              graphics.print(`❌ Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "orange")
-              graphics.print(`👉 Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+              graphics.print(` ⨯ Github Page DOES NOT exist: https://${githubID}.github.io/${suffix}`, "orange")
+              graphics.print(` ▲ Please ensure that Github Page (https://${githubID}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
               graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
-              graphics.print(`❌ Quitting...`, "orange")
+              graphics.print(` ⨯ Quitting...`, "orange")
               resolve(false) // Resolve the promise with false
             }
           }
         } else {
-          graphics.print('❌ Github ID Not Found! Please try again OR press CTRL + C to exit', "orange")
+          graphics.print(' ⨯ Github ID Not Found! Please try again OR press CTRL + C to exit', "orange")
           resolve(await validateGithubID(rl, suffix)) // Recursive call to prompt for GithubID again
         }
       } else {
-        graphics.print('❌ Invalid Github ID! Please try again OR press CTRL + C to exit', "orange")
+        graphics.print(' ⨯ Invalid Github ID! Please try again OR press CTRL + C to exit', "orange")
         resolve(await validateGithubID(rl, suffix)) // Recursive call to prompt for GithubID again
       }
     })
@@ -241,26 +241,26 @@ function validateGithubID(rl, suffix) {
 // Skip Github ID for login
 function skipGithubID(detectedUser, suffix) {
   return new Promise(async (resolve) => {
-    graphics.print(`🧪 Continuing with Github ID: ${detectedUser}`, "skyblue")
-    graphics.print(`👋 Welcome, ${detectedUser}!`, "yellow")
+    graphics.print(` ○ Continuing with Github ID: ${detectedUser}`, "skyblue")
+    graphics.print(` ▲ Welcome, ${detectedUser}!`, "yellow")
     const _ghpages = await isGithubPagesConfigured(detectedUser, suffix)
     if (_ghpages) {
-      graphics.print(`✅ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
-      graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
+      graphics.print(` ✓ Github Page exists: https://${detectedUser}.github.io/`, "lightgreen")
+      graphics.print(` ▲ Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "skyblue")
       graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "skyblue")
       resolve(true)
     } else {
       if (!suffix) {
-        graphics.print(`🚧 Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "yellow")
-        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
-        graphics.print(`💡 TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
+        graphics.print(` ● Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "yellow")
+        graphics.print(` ▲ Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "yellow")
+        graphics.print(` ◑ TIP: If the issue persists, try committing a minimal \'README.md\' (or \'index.html\') file to your remote repository`, "yellow")
         graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "yellow")
         resolve(true) // Resolve the promise with true
       } else {
-        graphics.print(`❌ Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "orange")
-        graphics.print(`👉 Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
+        graphics.print(` ⨯ Github Page DOES NOT exist: https://${detectedUser}.github.io/${suffix}`, "orange")
+        graphics.print(` ▲ Please ensure that Github Page (https://${detectedUser}.github.io/) is configured to auto-deploy upon push from the remote branch`, "orange")
         graphics.print(` ◥ docs: https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site`, "orange")
-        graphics.print(`❌ Quitting...`, "orange")
+        graphics.print(` ⨯ Quitting...`, "orange")
         resolve(false) // Resolve the promise with false
       }
     }
@@ -277,7 +277,7 @@ async function sendToRemote(branch, timestamp, githubKey, files) {
     }
     return true
   } catch (error) {
-    graphics.print('❌ Failed to Commit & Push to Git. Quitting...', "orange")
+    graphics.print(' ⨯ Failed to Commit & Push to Git. Quitting...', "orange")
     return null
   }
 }
@@ -287,31 +287,31 @@ async function gitCommitPush(status, validated, branch, githubKey, detectedUser,
   if (validated) {
     return new Promise(async (resolve) => {
       const timestamp = Date.now()
-      graphics.print(`🧪 Detected branch: ${branch}`, "skyblue")
+      graphics.print(` ○ Detected branch: ${branch}`, "skyblue")
       if (githubKey) {
-        graphics.print(`🧪 Detected signature fingerprint: ${githubKey}`, "skyblue")
-        graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -S -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+        graphics.print(` ○ Detected signature fingerprint: ${githubKey}`, "skyblue")
+        graphics.print(` ○ Trying auto-update: git add ${files}; git commit -S -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       } else {
-        graphics.print(`🧪 Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
+        graphics.print(` ○ Trying auto-update: git add ${files}; git commit -m "dev3: ${timestamp}"; git push -u origin ${branch}`, "skyblue")
       }
       if (status !== '') {
-        graphics.print('❗ There are other unadded files in the repository. Please add and commit them manually before proceeding', "orange")
-        graphics.print('❌ Quitting...', "orange")
+        graphics.print(' ■ There are other unadded files in the repository. Please add and commit them manually before proceeding', "orange")
+        graphics.print(' ⨯ Quitting...', "orange")
         resolve(false)
       } else {
-        rl.question(`⏰ Try git commit & push? [Y/N]: `, async (attempt) => {
+        rl.question(` ▶ Try git commit & push? [Y/N]: `, async (attempt) => {
           if (!attempt || attempt.toLowerCase() === 'y' || attempt.toLowerCase() === 'yes') {
             const _pushed = await sendToRemote(branch, timestamp, githubKey, files)
             resolve(_pushed)
             graphics.print(message, "lightgreen")
-            graphics.print(`👋 BYEE!`, "lightgreen")
+            graphics.print(` ▲ BYEE!`, "lightgreen")
             rl.close()
           } else if (attempt.toLowerCase() === 'n' || attempt.toLowerCase() === 'no') {
-            graphics.print(`👋 OK, BYEE!`, "lightgreen")
+            graphics.print(` ▲ OK, BYEE!`, "lightgreen")
             rl.close()
             resolve(false)
           } else {
-            graphics.print('⛔ Bad Input', "orange")
+            graphics.print(' ● Bad Input', "orange")
             resolve(await gitCommitPush(validated, branch, githubKey, detectedUser, rl, files, message)) // Recursive call
           }
         })
@@ -335,7 +335,7 @@ async function isRemoteSynced(branch) {
     return localCommit !== remoteCommit
   } catch (error) {
     // Handle errors, e.g., when git commands fail
-    graphics.print('❗ Failed to Fetch Remote Branch...', "orange")
+    graphics.print(' ■ Failed to Fetch Remote Branch...', "orange")
     return false
   }
 }

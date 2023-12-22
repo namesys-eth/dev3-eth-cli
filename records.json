@@ -1,8 +1,8 @@
 {
-  "signer": "0xf741E0844BF28FAe5Bf4745eb5E03a9F6f0575F4",
+  "signer": "0x726A5786679330a36E87001126AAEbfe81F525eE",
   "approval": null,
   "records": {
-    "contenthash": null,
+    "contenthash": "ipfs://QmSq8nvro3qVB5KmwRxGrhxij75t3thvLjX7eGVSzYuZw1",
     "address": {
       "eth": null
     },

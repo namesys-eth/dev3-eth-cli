@@ -15,14 +15,14 @@ export async function sign() {
     async function writeRecords(welcome) {
         if (welcome) {
             return new Promise(async (resolve) => {
-                graphics.print(`ℹ️  TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
-                rl.question('⏰ Continue in next step? [Y] OR, update manually? [N]: ', async (auto) => {
+                graphics.print(` ◑ TIP: ENS Records can be added in the next step or manually updated in \'records.json\' file`, "skyblue")
+                rl.question(' ▶ Continue in next step? [Y] OR, update manually? [N]: ', async (auto) => {
                     if (auto.toLowerCase() === 'y' || auto.toLowerCase() === 'yes') {
                         resolve(true)
                     } else if (auto.toLowerCase() === 'n' || auto.toLowerCase() === 'no') {
                         resolve(false)
                     } else {
-                        graphics.print('⛔ Bad Input', "orange")
+                        graphics.print(' ● Bad Input', "orange")
                         resolve(await writeRecords(welcome)) // Recursive call
                     }
                 })
@@ -34,13 +34,13 @@ export async function sign() {
     async function write_addr60(_addr60_, welcome, written) {
         if (welcome && written) {
             return new Promise(async (resolve) => {
-                rl.question('📝 Please enter your ETH address (address/60) and then press ENTER: ', async (_addr60) => {
+                rl.question(' ▶ Please enter your ETH address (address/60) and then press ENTER: ', async (_addr60) => {
                     if (_addr60) {
                         if (helper.isAddr(_addr60)) {  // strip '0x'
                             _addr60_[0].value = _addr60
                             resolve([true, _addr60_])
                         } else {
-                            graphics.print('⛔ Bad Input', "orange")
+                            graphics.print(' ● Bad Input', "orange")
                             resolve(await write_addr60(_addr60_, welcome, written)) // Recursive call
                         }
                     } else {
@@ -60,13 +60,13 @@ export async function sign() {
     async function write_avatar(_avatar_, welcome, written, written_addr60) {
         if (welcome && written && written_addr60) {
             return new Promise(async (resolve) => {
-                rl.question('📝 Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
+                rl.question(' ▶ Please enter avatar URL (text/avatar) and then press ENTER: ', async (_avatar) => {
                     if (_avatar) {
                         if (helper.isURL(_avatar)) {
                             _avatar_[0].value = _avatar
                             resolve([true, _avatar_])
                         } else {
-                            graphics.print('⛔ Bad Input', "orange")
+                            graphics.print(' ● Bad Input', "orange")
                             resolve(await write_avatar(_avatar_, welcome, written, written_addr60)) // Recursive call
                         }
                     } else {
@@ -86,13 +86,13 @@ export async function sign() {
     async function write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar) {
         if (welcome && written && written_addr60 && written_avatar) {
             return new Promise(async (resolve) => {
-                rl.question('📝 Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
+                rl.question(' ▶ Please enter contenthash value and then press ENTER: ', async (_contenthash) => {
                     if (_contenthash) {
                         if (helper.isContenthash(_contenthash)) {
                             _contenthash_[0].value = _contenthash
                             resolve([true, _contenthash_])
                         } else {
-                            graphics.print('⛔ Bad Input! Resetting...', "orange")
+                            graphics.print(' ● Bad Input! Resetting...', "orange")
                             resolve(await write_contenthash(_contenthash_, welcome, written, written_addr60, written_avatar)) // Recursive call
                         }
                     } else {
@@ -112,7 +112,7 @@ export async function sign() {
     async function confirmRecords(detectedUser, written, written_contenthash, addr60, avatar, contenthash) {
         if (welcome && !written && !written_contenthash) {
             return new Promise(async (resolve) => {
-                rl.question(`⏰ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
+                rl.question(` ▶ Please manually edit record keys in \'records.json\' file, save the file and then press ENTER: `, async (done) => {
                     let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
                     _buffer.githubid = detectedUser
                     _buffer.signer = JSON.parse(readFileSync(constants.verify, 'utf-8')).signer
@@ -160,7 +160,7 @@ export async function sign() {
             })
         } else if (welcome && written && written_contenthash) {
             return new Promise(async (resolve) => {
-                rl.question(`⏰ Please Confirm Records Update (press ENTER to confirm; CTRL + C to exit): `, async (done) => {
+                rl.question(` ▶ Please Confirm Records Update (press ENTER to confirm; CTRL + C to exit): `, async (done) => {
                     if (!done) {
                         let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
                         // Write to buffer
@@ -199,7 +199,7 @@ export async function sign() {
                         }
                         resolve(true)
                     } else {
-                        graphics.print('⛔ Bad Input', "orange")
+                        graphics.print(' ● Bad Input', "orange")
                         resolve(await confirmRecords(detectedUser, written, written_contenthash, addr60, avatar, contenthash)) // Recursive call
                     }
                 })
@@ -231,41 +231,41 @@ export async function sign() {
                     flag.addr60 = true
                 } else if (!__addr60.value || __addr60.value === null) {
                     flag.addr60 = true
-                    graphics.print('🧪 Empty \'addr60:\' value in \'records.json\'', "skyblue")
+                    graphics.print(' ○ Empty \'addr60:\' value in \'records.json\'', "skyblue")
                 } else {
-                    graphics.print('❗ Bad \'addr60:\' value in \'records.json\'', "orange")
+                    graphics.print(' ■ Bad \'addr60:\' value in \'records.json\'', "orange")
                 }
                 // avatar
                 if (__avatar.value && __avatar.value !== null && helper.isURL(__avatar.value)) {
                     flag.avatar = true
                 } else if (!__avatar.value || __avatar.value === null) {
                     flag.avatar = true
-                    graphics.print('🧪 Empty \'avatar:\' value in \'records.json\'', "skyblue")
+                    graphics.print(' ○ Empty \'avatar:\' value in \'records.json\'', "skyblue")
                 } else {
-                    graphics.print('❗ Bad \'avatar:\' value in \'records.json\'', "orange")
+                    graphics.print(' ■ Bad \'avatar:\' value in \'records.json\'', "orange")
                 }
                 // contenthash
                 if (__contenthash.value && __contenthash.value !== null && helper.isContenthash(__contenthash.value)) {
                     flag.contenthash = true
                 } else if (!__contenthash.value || __contenthash.value === null) {
                     flag.contenthash = true
-                    graphics.print('🧪 Empty \'contenthash:\' value in \'records.json\'', "skyblue")
+                    graphics.print(' ○ Empty \'contenthash:\' value in \'records.json\'', "skyblue")
                 } else {
-                    graphics.print('❗ Bad \'contenthash:\' value in \'records.json\'', "orange")
+                    graphics.print(' ■ Bad \'contenthash:\' value in \'records.json\'', "orange")
                 }
                 /* add more ENS Records here */
                 if (Object.values(flag).every(value => value === true)) {
-                    graphics.print(`✅ Records verified!`, "lightgreen")
+                    graphics.print(` ✓ Records verified!`, "lightgreen")
                     resolve(true)
                 } else {
-                    graphics.print(`❗ Records failed verification!`, "orange")
+                    graphics.print(` ■ Records failed verification!`, "orange")
                     resolve(false)
                 }
             })
         } else {
             return new Promise(async (resolve) => {
-                graphics.print(`❗ Records failed to write due to unknown reason!`, "orange")
-                graphics.print(`❌ Quitting...`, "orange")
+                graphics.print(` ■ Records failed to write due to unknown reason!`, "orange")
+                graphics.print(` ⨯ Quitting...`, "orange")
                 resolve(false)
                 rl.close()
             })
@@ -277,7 +277,7 @@ export async function sign() {
         if (welcome && record) {
             if (verified) {
                 return new Promise(async (resolve) => {
-                    graphics.print(`🧪 Signing Record: ${type}`, "skyblue")
+                    graphics.print(` ○ Signing Record: ${type}`, "skyblue")
                     const _signed = helper.signRecord(
                         `https://${detectedUser}.github.io`,
                         constants.NETWORK === 'mainnet' ? '1' : '5',
@@ -290,14 +290,14 @@ export async function sign() {
                 })
             } else {
                 return new Promise(async (resolve) => {
-                    graphics.print(`❌ Please fix the ${type} record & then re-try \'npm run publish\'. Quitting...`, "orange")
+                    graphics.print(` ⨯ Please fix the ${type} record & then re-try \'npm run publish\'. Quitting...`, "orange")
                     resolve([null, null])
                     rl.close()
                 })
             }
         } else {
             return new Promise(async (resolve) => {
-                graphics.print(`🚮 Skipping Record: ${type}`, welcome ? "skyblue" : "orange")
+                graphics.print(` ▽ Skipping Record: ${type}`, welcome ? "skyblue" : "orange")
                 resolve([null, null])
             })
         }
@@ -309,12 +309,12 @@ export async function sign() {
             return new Promise(async (resolve) => {
                 let _verify = JSON.parse(readFileSync(constants.verify, 'utf-8'))
                 let _buffer = JSON.parse(readFileSync(constants.record, 'utf-8'))
-                graphics.print(`🧪 Waiting for validation from Cloudflare...`, "skyblue")
+                graphics.print(` ○ Waiting for validation from Cloudflare...`, "skyblue")
                 const _url = `${constants.validator}${detectedUser}`
                 const response = await fetch(_url)
                 if (!response.ok) {
-                    graphics.print(`❗ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
-                    graphics.print(`❌ Quitting...`, "orange")
+                    graphics.print(` ■ Failed to connect to Cloudflare validator: error ${response.status}`, "orange")
+                    graphics.print(` ⨯ Quitting...`, "orange")
                     rl.close()
                     resolve(false)
                 }
@@ -323,8 +323,8 @@ export async function sign() {
                     _verify.verified = true
                     _verify.accessKey = verifier.approvalSig
                     _buffer.approval = verifier.approvalSig
-                    graphics.print(`✅ Validated Signer: ${_verify.signer}`, "lightgreen")
-                    graphics.print(`🧪 Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
+                    graphics.print(` ✓ Validated Signer: ${_verify.signer}`, "lightgreen")
+                    graphics.print(` ○ Writing records to .well-known/eth/dev3/${detectedUser}...`, "skyblue")
                     // addr60
                     if (_buffer.records.address.eth) {
                         let _addr60 = JSON.parse(readFileSync(constants.records.addr60, 'utf-8'))
@@ -359,8 +359,8 @@ export async function sign() {
                         writeFileSync(constants.records.contenthash, JSON.stringify(_contenthash, null, 2))
                     }
                 } else {
-                    graphics.print(`❗ Cloudflare validation failed: Signer DOES NOT match!`, "orange")
-                    graphics.print(`❌ Quitting...`, "orange")
+                    graphics.print(` ■ Cloudflare validation failed: Signer DOES NOT match!`, "orange")
+                    graphics.print(` ⨯ Quitting...`, "orange")
                     rl.close()
                     resolve(false)
                 }
@@ -381,7 +381,7 @@ export async function sign() {
             })
         } else {
             return new Promise(async (resolve) => {
-                graphics.print(`❌ Quitting...`, "orange")
+                graphics.print(` ⨯ Quitting...`, "orange")
                 rl.close()
                 resolve(false)
             })
@@ -407,7 +407,7 @@ export async function sign() {
     if (isGitRepo && detectedUser && synced) {
         userDetected = await helper.requestGithubID(detectedUser, rl)
     } else {
-        graphics.print(`❌ Quitting...`, "orange")
+        graphics.print(` ⨯ Quitting...`, "orange")
         rl.close()
     }
     const welcome = synced ? (userDetected ? await helper.skipGithubID(detectedUser, constants.verify) : await helper.validateGithubID(rl, constants.verify)) : false
