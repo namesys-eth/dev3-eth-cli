@@ -350,7 +350,7 @@ export async function sign() {
         if (
           __avatar.value &&
           __avatar.value !== null &&
-          helper.isURL(__avatar.value)
+          helper.isAvatar(__avatar.value)
         ) {
           flag.avatar = true;
         } else if (!__avatar.value || __avatar.value === null) {
